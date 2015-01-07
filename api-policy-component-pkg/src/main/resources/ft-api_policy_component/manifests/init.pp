@@ -20,6 +20,8 @@ class api_policy_component {
     class { "${module_name}::monitoring": }
     class { 'sudoers_sudocont': }
 
+    $webUrlTemplates = hiera('webUrlTemplates')
+
     content_runnablejar { "${module_name}_runnablejar":
         service_name        => "${module_name}",
         service_description => 'API Policy Component',

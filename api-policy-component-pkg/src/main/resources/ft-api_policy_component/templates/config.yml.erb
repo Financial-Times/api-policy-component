@@ -8,10 +8,9 @@ varnish:
   secondaryNodes: <%=scope.function_hiera('semanticReaderVarnishSecondaryNodes','null')%>
 
 pipeline:
-  webUrlTemplates:
-    "http://www.ft.com/ontology/origin/FTComMethode" : "http://www.ft.com/cms/s/{{originatingIdentifier}}.html"
-    "http://www.ft.com/ontology/origin/FT-CLAMO"  : "http://www.ft.com/fastft?post={{originatingIdentifier}}"
-    "http://www.ft.com/ontology/origin/FT-LABS-WP-1-24" : "{{originatingIdentifier}}"
+  webUrlTemplates: <% @webUrlTemplates.each_pair do |k, v| -%>
+                   <%= k %>: <%= v %>
+                   <% end -%>
 
 server:
 
