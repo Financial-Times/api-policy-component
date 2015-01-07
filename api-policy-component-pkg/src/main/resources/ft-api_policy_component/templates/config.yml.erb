@@ -8,9 +8,10 @@ varnish:
   secondaryNodes: <%=scope.function_hiera('semanticReaderVarnishSecondaryNodes','null')%>
 
 pipeline:
-  webUrlTemplates: <% @webUrlTemplates.each_pair do |k, v| -%>
-                   <%= k %>: <%= v %>
-                   <% end -%>
+  webUrlTemplates:
+        <% @webUrlTemplates.each_pair do |k, v| -%>
+        <%= k %>: <%= v %>
+        <% end -%>
 
 server:
 
