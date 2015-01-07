@@ -10,7 +10,7 @@ varnish:
 pipeline:
   webUrlTemplates:
         <% @webUrlTemplates.each_pair do |k, v| -%>
-        <%= k %>: <%= v %>
+        "<%= k %>" : "<%= v %>"
         <% end -%>
 
 server:
