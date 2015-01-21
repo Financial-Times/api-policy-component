@@ -12,6 +12,7 @@ import com.ft.jerseyhttpwrapper.ResilientClientBuilder;
 import com.ft.platform.dropwizard.AdvancedHealthCheckBundle;
 import com.ft.up.apipolicy.configuration.ApiPolicyConfiguration;
 import com.ft.up.apipolicy.filters.AddBrandFilterParameters;
+import com.ft.up.apipolicy.filters.MainImageFilter;
 import com.ft.up.apipolicy.filters.WebUrlCalculator;
 import com.ft.up.apipolicy.health.ReaderNodesHealthCheck;
 import com.ft.up.apipolicy.pipeline.ApiFilter;
@@ -45,20 +46,21 @@ public class ApiPolicyApplication extends Application<ApiPolicyConfiguration> {
 
 		RequestForwarder requestForwarder = new JerseyRequestForwarder(client,configuration.getVarnish());
 
-        JsonConverter tweaker = new JsonConverter(environment.getObjectMapper());
+        JsonConverter jsonTweaker = new JsonConverter(environment.getObjectMapper());
 
 
-        ApiFilter webUrlAdder = new WebUrlCalculator(configuration.getPipelineConfiguration().getWebUrlTemplates(),tweaker);
+        final ApiFilter webUrlAdder = new WebUrlCalculator(configuration.getPipelineConfiguration().getWebUrlTemplates(),jsonTweaker);
+        final ApiFilter mainImageFilter = new MainImageFilter(jsonTweaker);
 
         SortedSet<KnownEndpoint> knownEndpoints = new TreeSet<>();
 		knownEndpoints.add(new KnownEndpoint("^/content/.*",
-				new HttpPipeline(requestForwarder,webUrlAdder)));
+				new HttpPipeline(requestForwarder, webUrlAdder, mainImageFilter)));
 
         knownEndpoints.add(new KnownEndpoint("^/content/notifications.*",
-                new HttpPipeline(requestForwarder, new AddBrandFilterParameters(tweaker))));
+                new HttpPipeline(requestForwarder, new AddBrandFilterParameters(jsonTweaker))));
 
         knownEndpoints.add(new KnownEndpoint("^/enrichedcontent/.*",
-                new HttpPipeline(requestForwarder,webUrlAdder)));
+                new HttpPipeline(requestForwarder, webUrlAdder, mainImageFilter)));
 
         // DEFAULT CASE: Just forward it
         knownEndpoints.add(new KnownEndpoint("^/.*", new HttpPipeline(requestForwarder)));

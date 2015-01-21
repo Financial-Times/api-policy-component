@@ -9,6 +9,8 @@ import com.ft.up.apipolicy.pipeline.MutableResponse;
 import javax.ws.rs.core.UriBuilder;
 import java.util.HashMap;
 
+import static com.ft.up.apipolicy.configuration.Policy.*;
+
 /**
  * AddBrandFilterParameters
  *
@@ -28,19 +30,19 @@ public class AddBrandFilterParameters implements ApiFilter {
     @Override
     public MutableResponse processRequest(MutableRequest request, HttpPipelineChain chain) {
 
-        if(request.policyIs("FASTFT_CONTENT_ONLY")) {
+        if(request.policyIs(FASTFT_CONTENT_ONLY)) {
             request.getQueryParameters().add("forBrand",FASTFT_BRAND);
         }
 
-        if(request.policyIs("EXCLUDE_FASTFT_CONTENT")) {
+        if(request.policyIs(EXCLUDE_FASTFT_CONTENT)) {
             request.getQueryParameters().add("notForBrand",FASTFT_BRAND);
         }
         
-        if(request.policyIs("ALPHAVILLE_CONTENT_ONLY")) {
+        if(request.policyIs(ALPHAVILLE_CONTENT_ONLY)) {
             request.getQueryParameters().add("forBrand",ALPHAVILLE_BRAND);
         }
 
-        if(request.policyIs("EXCLUDE_ALPHAVILLE_CONTENT")) {
+        if(request.policyIs(EXCLUDE_ALPHAVILLE_CONTENT)) {
             request.getQueryParameters().add("notForBrand",ALPHAVILLE_BRAND);
         }
 
