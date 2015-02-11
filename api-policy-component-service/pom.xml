@@ -98,7 +98,7 @@
         <dependency>
             <groupId>com.ft.bodyprocessing</groupId>
             <artifactId>body-processing</artifactId>
-            <version>0.0.16</version>
+            <version>0.0.17</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
