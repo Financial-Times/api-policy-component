@@ -85,4 +85,6 @@ public class BodyProcessingFieldTransformerFactoryTest {
         assertThat(actualTransformedBody, is(equivalentToUnixString(expectedTransformedBody)));
     }
 
+    // yolande test comment
+
 }
