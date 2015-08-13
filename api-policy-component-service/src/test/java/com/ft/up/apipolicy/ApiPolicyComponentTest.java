@@ -15,6 +15,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 
@@ -28,9 +29,11 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.List;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ft.api.util.transactionid.TransactionIdUtils;
 import com.ft.up.apipolicy.configuration.ApiPolicyConfiguration;
@@ -42,7 +45,9 @@ import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
+
 import io.dropwizard.testing.junit.DropwizardAppRule;
+
 import org.apache.commons.io.IOUtils;
 import org.fest.util.Strings;
 import org.hamcrest.Description;
@@ -169,7 +174,8 @@ public class ApiPolicyComponentTest {
 
     private Client client;
     private ObjectMapper objectMapper;
-
+    private int leasedConnections;
+    
     @Before
     public void setup() {
         stubFor(WireMock.get(urlEqualTo(EXAMPLE_PATH)).willReturn(aResponse().withBody(EXAMPLE_JSON).withHeader("Content-Type", MediaType.APPLICATION_JSON).withStatus(200)));
@@ -178,12 +184,23 @@ public class ApiPolicyComponentTest {
         this.client = Client.create();
 
         objectMapper = new ObjectMapper();
+        leasedConnections = getLeasedConnections("semanticReaderVarnish");
 
     }
 
     @After
-    public void tearDown() {
+    public void checkThatNumberOfLeasedConnectionsHaveNotChanged(){
+        assertThat("connections should not leak", leasedConnections, equalTo(getLeasedConnections("semanticReaderVarnish")));
         WireMock.reset();
+    }
+
+    private int getLeasedConnections(String name){
+        return client.resource("http://localhost:" + 21082).path("/metrics") //hardcoded because we have no access to getAdminPort() on the app rule
+                .get(JsonNode.class)
+                .get("gauges")
+                .get("org.apache.http.conn.ClientConnectionManager." + name + ".leased-connections")
+                        .get("value").asInt();
+
     }
 
 

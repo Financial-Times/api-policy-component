@@ -6,6 +6,7 @@ varnish:
       timeout: 2000ms
   primaryNodes: ["localhost:9090:9091"]
   secondaryNodes: null
+  resilienceStrategy: SIMPLE_FAILOVER_STRATEGY
 
 pipeline:
   webUrlTemplates:
