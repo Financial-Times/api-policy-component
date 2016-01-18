@@ -2,6 +2,7 @@ package com.ft.up.apipolicy;
 
 import com.ft.up.apipolicy.filters.*;
 import io.dropwizard.Application;
+import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
@@ -89,7 +90,9 @@ public class ApiPolicyApplication extends Application<ApiPolicyConfiguration> {
         environment.servlets().addFilter("Transaction ID Filter",
                 new TransactionIdFilter()).addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), false, "/*");
 
-        Client client =  ResilientClientBuilder.in(environment).using(configuration.getVarnish()).build();
+        Client client = ResilientClientBuilder.in(environment).usingDNS()
+                .named("vulcan-client")
+                .build();
         environment.healthChecks()
                 .register("Reader API Connectivity",
                         new ReaderNodesHealthCheck("Reader API Connectivity ", configuration.getVarnish(), client, configuration.isCheckingVulcanHealth()));
