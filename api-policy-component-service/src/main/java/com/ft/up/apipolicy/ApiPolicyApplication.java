@@ -90,12 +90,6 @@ public class ApiPolicyApplication extends Application<ApiPolicyConfiguration> {
         environment.servlets().addFilter("Transaction ID Filter",
                 new TransactionIdFilter()).addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), false, "/*");
 
-        Client client = ResilientClientBuilder.in(environment).usingDNS()
-                .named("vulcan-client")
-                .build();
-        environment.healthChecks()
-                .register("Reader API Connectivity",
-                        new ReaderNodesHealthCheck("Reader API Connectivity ", configuration.getVarnish(), client, configuration.isCheckingVulcanHealth()));
     }
 
     private BodyProcessingFieldTransformer getBodyProcessingFieldTransformer() {
@@ -125,6 +119,9 @@ public class ApiPolicyApplication extends Application<ApiPolicyConfiguration> {
         RequestForwarder requestForwarder = new JerseyRequestForwarder(client,configuration.getVarnish());
         KnownEndpoint endpoint = new KnownEndpoint(urlPattern,
                 new HttpPipeline(requestForwarder, filterChain));
+        environment.healthChecks()
+                .register("Reader API Connectivity",
+                        new ReaderNodesHealthCheck("Reader API Connectivity ", configuration.getVarnish(), client, configuration.isCheckingVulcanHealth()));
         return endpoint;
     }
 }
