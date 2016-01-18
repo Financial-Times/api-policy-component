@@ -44,6 +44,8 @@ public class ReaderNodesHealthCheck extends AdvancedHealthCheck {
                     .build();
         }
 
+        System.out.println("healthcheckUri: "+healthcheckUri.toString());
+
         ClientResponse response = null;
         try {
             // Resilient Client provides functionality to try each node until at least one reports 200 OK.
