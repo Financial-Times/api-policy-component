@@ -20,20 +20,20 @@ public class MutableRequest {
     private String httpMethod;
     private byte[] requestEntity;
 
-    private final Set<String> policies;
+    private final Set<Policy> policies;
     private String transactionId;
 
-    public MutableRequest(final Set<String> policies, final String transactionId) {
+    public MutableRequest(final Set<Policy> policies, final String transactionId) {
         this.policies = Collections.unmodifiableSet(policies);
         this.transactionId = transactionId;
     }
 
-    public Set<String> getPolicies() {
+    public Set<Policy> getPolicies() {
         return policies;
     }
 
     public boolean policyIs(final Policy policy) {
-        return policies.contains(policy.getHeaderValue());
+        return policies.contains(policy);
     }
 
     public MultivaluedMap<String,String> getHeaders() {

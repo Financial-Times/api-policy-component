@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import com.ft.api.jaxrs.errors.ServerError;
 import com.ft.api.util.transactionid.TransactionIdUtils;
 import com.ft.up.apipolicy.LinkedMultivalueMap;
+import com.ft.up.apipolicy.configuration.Policy;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 /**
@@ -50,7 +51,7 @@ public class MutableHttpTranslator {
 
 
         MultivaluedMap<String, String> headers = new MultivaluedMapImpl();
-        Set<String> policies = Collections.emptySet();
+        Set<Policy> policies = Collections.emptySet();
 
         String transactionId = null;
 
@@ -68,8 +69,15 @@ public class MutableHttpTranslator {
                         policies = new LinkedHashSet<>();
                         while(values.hasMoreElements()) {
                             String value = values.nextElement();
-                            LOGGER.info("Processed Policies: {}", value);
-                            policies.addAll(Arrays.asList(value.split("[ ,]")));
+                            LOGGER.info("Requested Policies: {}", value);
+                            for (String policy : value.split("[ ,]+")) {
+                              try {
+                                policies.add(Policy.valueOf(policy));
+                              }
+                              catch (IllegalArgumentException e) {
+                                LOGGER.warn("Discarded unrecognized policy: {}", policy);
+                              }
+                            }
                         }
 
                     }

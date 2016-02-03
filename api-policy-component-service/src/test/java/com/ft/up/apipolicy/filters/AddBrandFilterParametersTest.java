@@ -10,11 +10,13 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import com.ft.up.apipolicy.JsonConverter;
+import com.ft.up.apipolicy.configuration.Policy;
 import com.ft.up.apipolicy.pipeline.HttpPipeline;
 import com.ft.up.apipolicy.pipeline.HttpPipelineChain;
 import com.ft.up.apipolicy.pipeline.MutableRequest;
 import com.ft.up.apipolicy.pipeline.MutableResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,7 +44,7 @@ public class AddBrandFilterParametersTest {
     private PolicyBrandsResolver policyBrandsResolver;
 
 
-    private MutableRequest exampleRequest = new MutableRequest(Collections.singleton("TEST"),getClass().getSimpleName());
+    private MutableRequest exampleRequest = new MutableRequest(Collections.<Policy>emptySet(),getClass().getSimpleName());
 
     private MutableResponse exampleErrorResponse;
     private MutableResponse minimalExampleResponse;

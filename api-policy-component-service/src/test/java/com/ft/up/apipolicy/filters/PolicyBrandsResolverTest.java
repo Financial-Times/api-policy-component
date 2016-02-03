@@ -11,9 +11,12 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import javax.ws.rs.core.MultivaluedMap;
 
+import com.ft.up.apipolicy.configuration.Policy;
 import com.ft.up.apipolicy.pipeline.MutableRequest;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,15 +32,10 @@ public class PolicyBrandsResolverTest {
     public static final String ALPHAVILLE_BRAND = "http://api.ft.com/things/89d15f70-640d-11e4-9803-0800200c9a66";
     public static final String BEYONDBRICS_BRAND = "http://api.ft.com/things/3a37a89e-14ce-4ac8-af12-961a9630dce3";
 
-    public static final String FASTFT_CONTENT_ONLY = "FASTFT_CONTENT_ONLY";
-    public static final String EXCLUDE_FASTFT_CONTENT = "EXCLUDE_FASTFT_CONTENT";
-
-    public static final String FAKE_POLICY = "FAKE_POLICY";
-
     private List<PolicyFilterParameter> policyFilterParameterList;
     private PolicyBrandsResolver policyBrandsResolver;
 
-    private Set<String> policySet;
+    private Set<Policy> policySet;
 
     @Mock
     private MutableRequest mutableRequest;
@@ -54,8 +52,8 @@ public class PolicyBrandsResolverTest {
     public void setUp() {
         policyFilterParameterList = new ArrayList<>();
 
-        onlyFastFT = new PolicyFilterParameter(FASTFT_CONTENT_ONLY, fastFTBrandList, null);
-        excludeFastFT = new PolicyFilterParameter(EXCLUDE_FASTFT_CONTENT, null, fastFTBrandList);
+        onlyFastFT = new PolicyFilterParameter(Policy.FASTFT_CONTENT_ONLY, fastFTBrandList, null);
+        excludeFastFT = new PolicyFilterParameter(Policy.EXCLUDE_FASTFT_CONTENT, null, fastFTBrandList);
 
         policyFilterParameterList.add(0, onlyFastFT);
         policyFilterParameterList.add(1, excludeFastFT);
@@ -68,7 +66,7 @@ public class PolicyBrandsResolverTest {
     @Test
     public void noParametersShouldBeAddedWhenNull(){
         policySet = new HashSet<>();
-        policySet.add(FAKE_POLICY);
+        policySet.add(Policy.INCLUDE_COMMENTS);
         when(mutableRequest.getPolicies()).thenReturn(policySet);
         policyBrandsResolver.applyQueryParams(mutableRequest);
         verify(mutableRequest, never()).getQueryParameters();
@@ -78,7 +76,7 @@ public class PolicyBrandsResolverTest {
     @Test
     public void brandParametersShouldBeAddedWhenPolicyIsFastFtContentOnly(){
         policySet = new HashSet<>();
-        policySet.add(FASTFT_CONTENT_ONLY);
+        policySet.add(Policy.FASTFT_CONTENT_ONLY);
         ArgumentCaptor<String> keyArgument = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> valueArgument = ArgumentCaptor.forClass(String.class);
         when(mutableRequest.getPolicies()).thenReturn(policySet);
@@ -92,7 +90,7 @@ public class PolicyBrandsResolverTest {
     @Test
     public void brandParametersShouldBeAddedWhenPolicyIsExcludeFastFtContent(){
         policySet = new HashSet<>();
-        policySet.add(EXCLUDE_FASTFT_CONTENT);
+        policySet.add(Policy.EXCLUDE_FASTFT_CONTENT);
         ArgumentCaptor<String> keyArgument = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> valueArgument = ArgumentCaptor.forClass(String.class);
         when(mutableRequest.getPolicies()).thenReturn(policySet);

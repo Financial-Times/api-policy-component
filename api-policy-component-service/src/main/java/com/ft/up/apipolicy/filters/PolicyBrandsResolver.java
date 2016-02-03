@@ -6,34 +6,36 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ft.up.apipolicy.configuration.Policy;
 import com.ft.up.apipolicy.pipeline.MutableRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PolicyBrandsResolver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PolicyBrandsResolver.class);
-    private Map<String, PolicyFilterParameter> policyFilterParameterMap;
+    private Map<Policy, PolicyFilterParameter> policyFilterParameterMap;
 
     public PolicyBrandsResolver(@JsonProperty("policyFilterParameterList") List<PolicyFilterParameter> policyFilterParameterList) {
 
-        policyFilterParameterMap = new HashMap<String, PolicyFilterParameter>();
+        policyFilterParameterMap = new HashMap<>();
 
         for(PolicyFilterParameter policyFilterParameter : policyFilterParameterList){
             policyFilterParameterMap.put(policyFilterParameter.getPolicy(), policyFilterParameter);
         }
     }
 
-    public Map<String, PolicyFilterParameter> getPolicyFilterParameterMap() {
+    public Map<Policy, PolicyFilterParameter> getPolicyFilterParameterMap() {
         return policyFilterParameterMap;
     }
 
 
     public void applyQueryParams(MutableRequest request) {
 
-        Set<String> policySet = request.getPolicies();
+        Set<Policy> policySet = request.getPolicies();
 
-        for(String policy:policySet){
+        for(Policy policy:policySet){
             PolicyFilterParameter policyFilterParameter = policyFilterParameterMap.get(policy);
 
             if(policyFilterParameter == null){

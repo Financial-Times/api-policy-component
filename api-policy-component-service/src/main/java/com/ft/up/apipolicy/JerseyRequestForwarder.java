@@ -8,6 +8,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 
 import com.ft.jerseyhttpwrapper.config.EndpointConfiguration;
+import com.ft.up.apipolicy.configuration.Policy;
 import com.ft.up.apipolicy.pipeline.MutableRequest;
 import com.ft.up.apipolicy.pipeline.MutableResponse;
 import com.ft.up.apipolicy.pipeline.RequestForwarder;
@@ -59,6 +60,10 @@ public class JerseyRequestForwarder implements RequestForwarder {
                 resource = resource.header(headerName,value);
                 LOGGER.debug("Sending Header: {}={}",headerName,value);
             }
+        }
+        
+        for (Policy p : request.getPolicies()) {
+          p.applyTo(resource);
         }
         
         ClientResponse clientResponse = null;

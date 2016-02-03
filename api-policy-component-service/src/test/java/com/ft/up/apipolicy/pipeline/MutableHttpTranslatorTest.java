@@ -9,12 +9,15 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import com.ft.up.apipolicy.configuration.Policy;
 import com.google.common.base.Charsets;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -151,11 +154,12 @@ public class MutableHttpTranslatorTest {
     }
 
     @Test
-    public void shouldAddAllPoliciesFromXPolicyHeaderHoweverConfigured() {
+    public void shouldAddAllValidPoliciesFromXPolicyHeaderHoweverConfigured() {
         // supports multiple values in one header AND multiple versions of the header
         MultivaluedMap<String,String> headersPresent = new MultivaluedMapImpl();
-        headersPresent.add(HttpPipeline.POLICY_HEADER_NAME, "POLICY_ONE, POLICY_TWO");
-        headersPresent.add(HttpPipeline.POLICY_HEADER_NAME, "POLICY_THREE");
+        headersPresent.add(HttpPipeline.POLICY_HEADER_NAME, String.format(Policy.EXCLUDE_ALPHAVILLE_CONTENT.getHeaderValue()));
+        headersPresent.add(HttpPipeline.POLICY_HEADER_NAME, String.format("foo, %s", Policy.EXCLUDE_FASTFT_CONTENT.getHeaderValue()));
+        headersPresent.add(HttpPipeline.POLICY_HEADER_NAME, Policy.INCLUDE_RICH_CONTENT.getHeaderValue());
 
         Vector<String> headerNames = new Vector<>(headersPresent.keySet());
 
@@ -169,7 +173,7 @@ public class MutableHttpTranslatorTest {
         MutableHttpTranslator translator = new MutableHttpTranslator();
 
         MutableRequest result  = translator.translateFrom(request);
-        assertThat(result.getPolicies(),hasItems("POLICY_ONE","POLICY_TWO","POLICY_THREE"));
+        assertThat(result.getPolicies(),hasItems(Policy.EXCLUDE_ALPHAVILLE_CONTENT, Policy.EXCLUDE_FASTFT_CONTENT, Policy.INCLUDE_RICH_CONTENT));
 
 
     }

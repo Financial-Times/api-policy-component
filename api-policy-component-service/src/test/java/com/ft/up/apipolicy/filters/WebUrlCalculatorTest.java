@@ -12,10 +12,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.ft.up.apipolicy.JsonConverter;
+import com.ft.up.apipolicy.configuration.Policy;
 import com.ft.up.apipolicy.pipeline.HttpPipelineChain;
 import com.ft.up.apipolicy.pipeline.MutableRequest;
 import com.ft.up.apipolicy.pipeline.MutableResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,7 +62,7 @@ public class WebUrlCalculatorTest {
     private HttpPipelineChain mockChain;
 
     private WebUrlCalculator calculator = new WebUrlCalculator(WEB_URL_TEMPLATES, JsonConverter.testConverter());
-    private MutableRequest exampleRequest = new MutableRequest(Collections.singleton("TEST"), getClass().getSimpleName());
+    private MutableRequest exampleRequest = new MutableRequest(Collections.<Policy>emptySet(), getClass().getSimpleName());
 
     private MutableResponse exampleErrorResponse;
     private MutableResponse webUrlNonEligibleIdentifierResponse;

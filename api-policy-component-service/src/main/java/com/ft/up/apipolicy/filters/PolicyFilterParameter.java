@@ -5,16 +5,17 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ft.up.apipolicy.configuration.Policy;
 
 public class PolicyFilterParameter {
 
-    private String policy;
+    private Policy policy;
     private List<String> forBrand;
     private List<String> notForBrand;
 
 
 
-    public PolicyFilterParameter(@JsonProperty("policy") String policy,
+    public PolicyFilterParameter(@JsonProperty("policy") Policy policy,
                                  @JsonProperty("forBrand") List<String> forBrand,
                                  @JsonProperty("notForBrand") List<String> notForBrand) {
         this.policy = policy;
@@ -23,7 +24,7 @@ public class PolicyFilterParameter {
     }
 
     @NotNull
-    public String getPolicy() {
+    public Policy getPolicy() {
         return policy;
     }
 
