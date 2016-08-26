@@ -14,7 +14,6 @@ import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
-
 import org.apache.commons.io.IOUtils;
 import org.fest.util.Strings;
 import org.hamcrest.Description;
@@ -26,7 +25,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.dropwizard.testing.junit.DropwizardAppRule;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -38,11 +40,6 @@ import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriBuilder;
-
-import io.dropwizard.testing.junit.DropwizardAppRule;
 
 import static com.ft.up.apipolicy.JsonConverter.JSON_MAP_TYPE;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -76,6 +73,7 @@ public class ApiPolicyComponentHappyPathsTest {
 
     public static final String EXAMPLE_PATH = "/example";
     public static final String CONTENT_PATH = "/content/bcafca32-5bc7-343f-851f-fd6d3514e694";
+    public static final String CONTENT_PATH_WITH_WEB_URL = "/content/34b43ca3-fbea-4677-add7-c0aa47101d5b";
     public static final String CONTENT_PATH_2 = "/content/f3b60ad0-acda-11e2-a7c4-002128161462";
     public static final String ENRICHED_CONTENT_PATH = "/enrichedcontent/bcafca32-5bc7-343f-851f-fd6d3514e694";
     public static final String BASE_NOTIFICATION_PATH = "/content/notifications?since=2014-10-15&type=article";
@@ -107,6 +105,19 @@ public class ApiPolicyComponentHappyPathsTest {
                 "\"identifierValue\": \"220322\"\n" +
                 "}]" +
             "}";
+    private static final String CONTENT_PATH_WITH_WEB_URL_JSON =
+            "{" +
+                "\"uuid\": \"34b43ca3-fbea-4677-add7-c0aa47101d5b\", " +
+                "\"bodyXML\" : \"<body>some article</body>\",\n" +
+                "\"openingXML\" : \"<body>some article</body>\",\n" +
+                "\"alternativeTitles\" : {},\n" +
+                "\"lastModified\": \"2015-12-13T17:04:54.636Z\",\n" +
+                "\"identifiers\": [{\n" +
+                "\"authority\": \"http://www.ft.com/ontology/origin/FT-CLAMO\",\n" +
+                "\"identifierValue\": \"220322\"\n" + "}],\n" +
+                "\"webUrl\": \"http://www.ft.com/some-vanity-url\"\n" +
+                "}";
+
     private static final String ENRICHED_CONTENT_JSON =
             "{" +
                 "\"uuid\": \"bcafca32-5bc7-343f-851f-fd6d3514e694\", " +
@@ -203,6 +214,7 @@ public class ApiPolicyComponentHappyPathsTest {
         stubFor(WireMock.get(urlEqualTo(EXAMPLE_PATH)).willReturn(aResponse().withBody(EXAMPLE_JSON).withHeader("Content-Type", MediaType.APPLICATION_JSON).withStatus(200)));
         stubFor(WireMock.post(urlEqualTo(SUGGEST_PATH)).willReturn(aResponse().withBody(SUGGEST_RESPONSE_JSON).withHeader("Content-Type", MediaType.APPLICATION_JSON).withStatus(200)));
         stubFor(WireMock.get(urlPathEqualTo(CONTENT_PATH)).willReturn(aResponse().withBody(CONTENT_JSON).withHeader("Content-Type", MediaType.APPLICATION_JSON).withStatus(200)));
+        stubFor(WireMock.get(urlPathEqualTo(CONTENT_PATH_WITH_WEB_URL)).willReturn(aResponse().withBody(CONTENT_PATH_WITH_WEB_URL_JSON).withHeader("Content-Type", MediaType.APPLICATION_JSON).withStatus(200)));
 
         this.client = Client.create();
         objectMapper = new ObjectMapper();
@@ -309,6 +321,24 @@ public class ApiPolicyComponentHappyPathsTest {
             Map<String, Object> result = expectOKResponseWithJSON(response);
 
             assertWebUrl(result, "http://www.ft.com/fastft/220322");
+
+        } finally {
+            response.close();
+        }
+    }
+
+    @Test
+    public void shouldGetTheContentWithExistingWebUrlField() throws IOException {
+        URI uri  = fromFacade(CONTENT_PATH_WITH_WEB_URL).build();
+
+        ClientResponse response = client.resource(uri).get(ClientResponse.class);
+
+        try {
+            verify(getRequestedFor(urlEqualTo(CONTENT_PATH_WITH_WEB_URL)));
+
+            Map<String, Object> result = expectOKResponseWithJSON(response);
+
+            assertWebUrl(result, "http://www.ft.com/some-vanity-url");
 
         } finally {
             response.close();

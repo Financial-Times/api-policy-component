@@ -1,26 +1,27 @@
 package com.ft.up.apipolicy.filters;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.when;
-
-import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.ft.up.apipolicy.JsonConverter;
 import com.ft.up.apipolicy.pipeline.HttpPipelineChain;
 import com.ft.up.apipolicy.pipeline.MutableRequest;
 import com.ft.up.apipolicy.pipeline.MutableResponse;
+
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WebUrlCalculatorTest {
@@ -57,6 +58,11 @@ public class WebUrlCalculatorTest {
             "\"authority\": \"http://api.ft.com/system/FT-LABS-WP-1-91\",\n" +
             "\"identifierValue\": \"219512\"\n" +
             "}] }";
+    private final static String MINIMAL_PARTIAL_EXAMPLE_WITH_WEB_URL = "{ \"identifiers\": [{\n" +
+            "\"authority\": \"http://api.ft.com/system/FT-LABS-WP-1-91\",\n" +
+            "\"identifierValue\": \"219512\",\n" +
+            "\"webUrl\": \"http://www.ft.com/some-vanity-url\"\n" +
+            "}] }";
     private final static String NO_IDENTIFIERS_RESPONSE = "{ \"identifiers\": [] }";
     private final static Map<String, String> WEB_URL_TEMPLATES = new HashMap<>();
 
@@ -72,6 +78,7 @@ public class WebUrlCalculatorTest {
     private MutableResponse webUrlEligibleIdentifierResponse;
     private MutableResponse originatingSystemIsNullResponse;
     private MutableResponse minimalPartialExampleResponse;
+    private MutableResponse exampleResponseWithWebUrl;
 
     @Before
     public void setUpExamples() {
@@ -90,6 +97,10 @@ public class WebUrlCalculatorTest {
         minimalPartialExampleResponse.setStatus(200);
         minimalPartialExampleResponse.getHeaders().putSingle("Content-Type", "application/json");
 
+        exampleResponseWithWebUrl = new MutableResponse(new MultivaluedMapImpl(), MINIMAL_PARTIAL_EXAMPLE_WITH_WEB_URL.getBytes());
+        exampleResponseWithWebUrl.setStatus(200);
+        exampleResponseWithWebUrl.getHeaders().putSingle("Content-Type", "application/json");
+
         webUrlEligibleIdentifierResponse = new MutableResponse(new MultivaluedMapImpl(), WEB_URL_ELIGIBLE_IDENTIFIER_RESPONSE);
         webUrlEligibleIdentifierResponse.setStatus(200);
         webUrlEligibleIdentifierResponse.getHeaders().putSingle("Content-Type", "application/json");
@@ -107,6 +118,15 @@ public class WebUrlCalculatorTest {
         MutableResponse response = calculator.processRequest(exampleRequest, mockChain);
 
         assertThat(response.getEntity(), is(ERROR_RESPONSE.getBytes()));
+    }
+
+    @Test
+    public void shouldNotProcessIfWebUrlExists() {
+        when(mockChain.callNextFilter(exampleRequest)).thenReturn(exampleResponseWithWebUrl);
+
+        MutableResponse response = calculator.processRequest(exampleRequest, mockChain);
+
+        assertThat(response.getEntity(), is(MINIMAL_PARTIAL_EXAMPLE_WITH_WEB_URL.getBytes()));
     }
 
     @Test
