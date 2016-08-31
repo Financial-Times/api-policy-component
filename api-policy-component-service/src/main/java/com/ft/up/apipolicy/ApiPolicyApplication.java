@@ -1,10 +1,5 @@
 package com.ft.up.apipolicy;
 
-import java.util.EnumSet;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import javax.servlet.DispatcherType;
-
 import com.ft.api.jaxrs.errors.RuntimeExceptionMapper;
 import com.ft.api.util.buildinfo.BuildInfoResource;
 import com.ft.api.util.transactionid.TransactionIdFilter;
@@ -31,7 +26,15 @@ import com.ft.up.apipolicy.resources.RequestHandler;
 import com.ft.up.apipolicy.resources.WildcardEndpointResource;
 import com.ft.up.apipolicy.transformer.BodyProcessingFieldTransformer;
 import com.ft.up.apipolicy.transformer.BodyProcessingFieldTransformerFactory;
+
 import com.sun.jersey.api.client.Client;
+
+import java.util.EnumSet;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import javax.servlet.DispatcherType;
+
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -85,7 +88,7 @@ public class ApiPolicyApplication extends Application<ApiPolicyConfiguration> {
                 identifiersFilter, webUrlAdder, linkValidationFilter, suppressMarkup, mainImageFilter, alternativeTitlesFilter, removeCommentsFieldRegardlessOfPolicy, stripProvenance, stripLastModifiedDate, _unstable_stripOpeningXml));
 
         knownWildcardEndpoints.add(createEndpoint(environment, configuration, "^/content-preview/.*", "content-preview",
-                identifiersFilter, webUrlAdder, suppressMarkup, mainImageFilter, alternativeTitlesFilter, stripCommentsFields, stripProvenance, stripLastModifiedDate, _unstable_stripOpeningXml));
+                identifiersFilter, suppressMarkup, mainImageFilter, alternativeTitlesFilter, stripCommentsFields, stripProvenance, stripLastModifiedDate, _unstable_stripOpeningXml));
 
         knownWildcardEndpoints.add(createEndpoint(environment, configuration, "^/content/notifications.*", "notifications", mediaResourceNotificationsFilter, brandFilter, stripNestedProvenance, stripNestedLastModifiedDate));
 
