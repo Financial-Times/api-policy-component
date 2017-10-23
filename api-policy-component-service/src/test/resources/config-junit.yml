@@ -35,10 +35,12 @@ server:
   applicationConnectors:
     - type: http
       port: 21080
-
+      selectorThreads: 2
+      
   adminConnectors:
-      - type: http
-        port: 21082
+    - type: http
+      port: 21082
+      selectorThreads: 2
 
   requestLog:
 

@@ -1,7 +1,8 @@
-FROM coco/dropwizardbase:0.7.x-mvn333
+FROM openjdk:8-jdk-alpine
+
 ADD .git/ /.git/
 ADD api-policy-component-service/ /api-policy-component-service/
-RUN apk --update add git \
+RUN apk --update add git maven \
   && cd api-policy-component-service \
   && HASH=$(git log -1 --pretty=format:%H) \
   && TAG=$(git tag -l --points-at $HASH) \
@@ -12,7 +13,7 @@ RUN apk --update add git \
   && rm target/api-policy-component-service-*-sources.jar \
   && mv target/api-policy-component-service-*.jar /api-policy-component-service.jar \
   && mv config-local.yml /config.yml \
-  && apk del git \
+  && apk del git maven \
   && rm -rf /var/cache/apk/* \
   && rm -rf /root/.m2/*
 
