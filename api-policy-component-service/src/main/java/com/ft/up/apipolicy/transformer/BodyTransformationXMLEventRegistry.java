@@ -18,7 +18,7 @@ public class BodyTransformationXMLEventRegistry extends XMLEventHandlerRegistry 
     private static final String IMAGE_SET_CLASS_URI = "http://www.ft.com/ontology/content/ImageSet";
     private static final String MEDIA_RESOURCE_CLASS_URI = "http://www.ft.com/ontology/content/MediaResource";
     private static final String FT_CONTENT = "ft-content";
-    private static final String[] elementsToStrip = {"pull-quote", "promo-box", "ft-related", "timeline", "ft-timeline", "table", "big-number", "img"};
+    private static final String[] elementsToStrip = {"pull-quote", "promo-box", "ft-related", "timeline", "ft-timeline", "table", "big-number", "img", "marketdata", "podcast-promo"};
 
     public BodyTransformationXMLEventRegistry() {
 
@@ -29,7 +29,7 @@ public class BodyTransformationXMLEventRegistry extends XMLEventHandlerRegistry 
         registerEntityReferenceEventHandler(new PlainTextHtmlEntityReferenceEventHandler());
 
         registerStartAndEndElementEventHandler(new StripElementAndContentsXMLEventHandler(), elementsToStrip);
-		    registerStartAndEndElementEventHandler(new StripElementByClassEventHandler("twitter-tweet", new RetainXMLEventHandler()), "blockquote");
+        registerStartAndEndElementEventHandler(new StripElementByClassEventHandler("twitter-tweet", new RetainXMLEventHandler()), "blockquote");
         registerStartAndEndElementEventHandler(
                 new StripIfSpecificAttributes(
                         Arrays.asList(
