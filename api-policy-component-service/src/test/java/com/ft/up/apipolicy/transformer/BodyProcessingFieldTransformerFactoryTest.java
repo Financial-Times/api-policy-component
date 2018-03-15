@@ -1,14 +1,14 @@
 package com.ft.up.apipolicy.transformer;
 
-import static com.ft.up.apipolicy.EquivalentIgnoringWindowsLineEndings.equivalentToUnixString;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-
 import com.ft.bodyprocessing.transformer.FieldTransformer;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import static com.ft.up.apipolicy.EquivalentIgnoringWindowsLineEndings.equivalentToUnixString;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 public class BodyProcessingFieldTransformerFactoryTest {
 
@@ -34,13 +34,13 @@ public class BodyProcessingFieldTransformerFactoryTest {
 
 
     @Test
-    public void shouldRemoveVideoAndStripOutSurroundingTag(){
+    public void shouldRemoveVideoAndStripOutSurroundingTag() {
         String original = "<body><p>He and a shellshocked woman called Hadiza sheltered there for three days while the marauding militants looted and burnt houses. At night the two curled up beside the bullet-pocked wall and fell into an exhausted sleep to the sound of celebratory gunshots. One morning Hadiza crept out to find water and never returned. By nightfall, Idris decided to run.</p>\n<p><a href=\"http://player.vimeo.com/video/69104660\"></a></p>\n<p>“When I reached the bush, I was relieved at first but then I saw bodies everywhere. I walked through five villages and each one I passed was empty except for dead bodies.”</p>\n\n\n\n</body>";
-        String expected = "<body><p>He and a shellshocked woman called Hadiza sheltered there for three days while the marauding militants looted and burnt houses. At night the two curled up beside the bullet-pocked wall and fell into an exhausted sleep to the sound of celebratory gunshots. One morning Hadiza crept out to find water and never returned. By nightfall, Idris decided to run.</p>\n<p>“When I reached the bush, I was relieved at first but then I saw bodies everywhere. I walked through five villages and each one I passed was empty except for dead bodies.”</p>\n\n\n\n</body>" ;
+        String expected = "<body><p>He and a shellshocked woman called Hadiza sheltered there for three days while the marauding militants looted and burnt houses. At night the two curled up beside the bullet-pocked wall and fell into an exhausted sleep to the sound of celebratory gunshots. One morning Hadiza crept out to find water and never returned. By nightfall, Idris decided to run.</p>\n<p>“When I reached the bush, I was relieved at first but then I saw bodies everywhere. I walked through five villages and each one I passed was empty except for dead bodies.”</p>\n\n\n\n</body>";
 
         checkTransformation(original, expected);
     }
-    
+
     @Test
     public void shouldRemovePromoBoxes() {
         String original = "<body><p>This article contains a promobox</p><promo-box><promo-title><p><a href=\"http://www.ft.com/reports/ft-500-2011\" title=\"www.ft.com\">FT 500</a></p></promo-title><promo-headline><p>Headline</p></promo-headline><promo-image><content data-embedded=\"true\" id=\"432b5632-9e79-11e0-0a0f-978e959e1689\" type=\"http://www.ft.com/ontology/content/ImageSet\"></content></promo-image><promo-intro><p>The risers and fallers in our annual list of the world’s biggest companies</p></promo-intro><promo-link><p><a href=\"http://www.ft.com/cms/s/0/0bdf4bb6-6676-11e4-8bf6-00144feabdc0.html\"></a></p></promo-link></promo-box></body>";
@@ -49,62 +49,62 @@ public class BodyProcessingFieldTransformerFactoryTest {
     }
 
     @Test
-    public void shouldRemoveFastFTVideoAttachment(){
+    public void shouldRemoveFastFTVideoAttachment() {
         String original = "<body><p>Anton Howes discusses the standard theories regarding the causes of a 1500% GDP increase during the industrial revolution.</p><a href=\"https://www.youtube.com/watch?v=nkEa0zTdJ-8\" data-asset-type=\"video\" data-embedded=\"true\" title=\"Causes of the Industrial Revolution\">Causes of the Industrial Revolution</a></body>";
-        String expected = "<body><p>Anton Howes discusses the standard theories regarding the causes of a 1500% GDP increase during the industrial revolution.</p></body>" ;
+        String expected = "<body><p>Anton Howes discusses the standard theories regarding the causes of a 1500% GDP increase during the industrial revolution.</p></body>";
 
         checkTransformation(original, expected);
     }
 
     @Test
-    public void shouldRemoveInteractiveGraphic(){
+    public void shouldRemoveInteractiveGraphic() {
         String original = "<body><p>Anton Howes discusses the standard theories regarding the causes of a 1500% GDP increase during the industrial revolution.</p><a href=\"http://www.ft.com/ig/widgets/sortable-table/v1/widget/index.html?key=1EbhZ99KsC8xd0Aj4UN6DnrZfjWAvsaaUn2AK4IGHC_o\" data-asset-type=\"interactive-graphic\" width=\"900\" height=\"670\"></a></body>";
-        String expected = "<body><p>Anton Howes discusses the standard theories regarding the causes of a 1500% GDP increase during the industrial revolution.</p></body>" ;
+        String expected = "<body><p>Anton Howes discusses the standard theories regarding the causes of a 1500% GDP increase during the industrial revolution.</p></body>";
 
         checkTransformation(original, expected);
     }
 
     @Test
-    public void shouldRemoveInteractiveGraphicWithTextBetweenTheTags(){
+    public void shouldRemoveInteractiveGraphicWithTextBetweenTheTags() {
         String original = "<body><p>Anton Howes discusses the standard theories regarding the causes of a 1500% GDP increase during the industrial revolution.</p><a href=\"http://www.ft.com/ig/widgets/sortable-table/v1/widget/index.html?key=1EbhZ99KsC8xd0Aj4UN6DnrZfjWAvsaaUn2AK4IGHC_o\" data-asset-type=\"interactive-graphic\" width=\"900\" height=\"670\">http://www.ft.com/ig/widgets/sortable-table/v1/widget/index.html?key=1EbhZ99KsC8xd0Aj4UN6DnrZfjWAvsaaUn2AK4IGHC_o</a></body>";
-        String expected = "<body><p>Anton Howes discusses the standard theories regarding the causes of a 1500% GDP increase during the industrial revolution.</p></body>" ;
+        String expected = "<body><p>Anton Howes discusses the standard theories regarding the causes of a 1500% GDP increase during the industrial revolution.</p></body>";
 
         checkTransformation(original, expected);
     }
 
     @Test
-    public void shouldRemoveOldStyleFastFTVideoAttachment(){
+    public void shouldRemoveOldStyleFastFTVideoAttachment() {
         String original = "<body><p>Anton Howes discusses the standard theories regarding the causes of a 1500% GDP increase during the industrial revolution.</p><a href=\"https://www.youtube.com/watch?v=nkEa0zTdJ-8\"></a></body>";
-        String expected = "<body><p>Anton Howes discusses the standard theories regarding the causes of a 1500% GDP increase during the industrial revolution.</p></body>" ;
+        String expected = "<body><p>Anton Howes discusses the standard theories regarding the causes of a 1500% GDP increase during the industrial revolution.</p></body>";
 
         checkTransformation(original, expected);
     }
 
     @Test
-    public void shouldNotRemoveAStandardLinkEvenToYouTube(){
+    public void shouldNotRemoveAStandardLinkEvenToYouTube() {
         String original = "<body><p>Anton Howes discusses the standard theories regarding the causes of a 1500% GDP increase during the industrial revolution.</p><a href=\"https://www.youtube.com/watch?v=nkEa0zTdJ-8\">Informative Video</a></body>";
 
         checkTransformation(original, original);
     }
 
     @Test
-    public void shouldRemoveInlineImagesAndStripOutSurroundingTag(){
+    public void shouldRemoveInlineImagesAndStripOutSurroundingTag() {
         String original = "<body><p>He sheltered there.</p>\n<p><ft-content type=\"http://www.ft.com/ontology/content/ImageSet\" url=\"https://api.ft.com/content/a4456c3a-6a6a-11e4-8fca-00144feabdc0\">image title</ft-content></p>\n<p>“I saw bodies everywhere.”</p>\n\n\n\n</body>";
-        String expected = "<body><p>He sheltered there.</p>\n<p>“I saw bodies everywhere.”</p>\n\n\n\n</body>" ;
+        String expected = "<body><p>He sheltered there.</p>\n<p>“I saw bodies everywhere.”</p>\n\n\n\n</body>";
 
         checkTransformation(original, expected);
     }
 
     @Test
-    public void shouldRemoveInlineVideosAndStripOutSurroundingTag(){
+    public void shouldRemoveInlineVideosAndStripOutSurroundingTag() {
         String original = "<body><p>He sheltered there.</p>\n<p><ft-content data-embedded=\"true\" type=\"http://www.ft.com/ontology/content/MediaResource\" url=\"http://api.ft.com/content/807a95c5-87c3-3aee-9239-387f6dc32a60\"></ft-content></p>\n<p>“I saw bodies everywhere.”</p>\n\n\n\n</body>";
-        String expected = "<body><p>He sheltered there.</p>\n<p>“I saw bodies everywhere.”</p>\n\n\n\n</body>" ;
+        String expected = "<body><p>He sheltered there.</p>\n<p>“I saw bodies everywhere.”</p>\n\n\n\n</body>";
 
         checkTransformation(original, expected);
     }
 
     @Test
-    public void shouldRetainInlineArticleReferences(){
+    public void shouldRetainInlineArticleReferences() {
         String original = "<body><p>He sheltered there.</p>\n<p><ft-content type=\"http://www.ft.com/ontology/content/Article\" url=\"https://api.ft.com/content/b4456c3a-6a6a-11e4-8fca-00144feabdc1\">article title</ft-content></p>\n<p>“I saw bodies everywhere.”</p>\n\n\n\n</body>";
 
         checkTransformation(original, original);
@@ -113,8 +113,22 @@ public class BodyProcessingFieldTransformerFactoryTest {
     @Test
     public void testShouldRemoveInlineExternalImages() throws Exception {
         String original = "<body><p>He sheltered there.<img alt=\"Saloua Raouda Choucair's ‘Composition'\" height=\"445\" src=\"http://im.ft-static.com/content/images/7784185e-a888-11e2-8e5d-00144feabdc0.img\" width=\"600\"/></p>\n\n\n\n</body>";
-        String expected = "<body><p>He sheltered there.</p>\n\n\n\n</body>" ;
+        String expected = "<body><p>He sheltered there.</p>\n\n\n\n</body>";
 
+        checkTransformation(original, expected);
+    }
+
+    @Test
+    public void shouldRemoveMarketdata() {
+        String original = "<body><p>This article contains a marketdata</p><marketdata figicode=\"somefigicode\" startdata=\"some date\" live-until=\"publish date + 1 week\" />\n<p>This is after it</p></body>";
+        String expected = "<body><p>This article contains a marketdata</p>\n<p>This is after it</p></body>";
+        checkTransformation(original, expected);
+    }
+
+    @Test
+    public void shouldRemovePodcastpromo() {
+        String original = "<body><p>This article contains a podcast-promo</p><podcast-promo id=\"16ec6a72-d5db-4322-96c6-314b051eb978\">\n <h2>Optional Podcast title here</h2>\n <p>Optional Podcast description here</p>\n </podcast-promo>\n<p>This is after it</p></body>";
+        String expected = "<body><p>This article contains a podcast-promo</p>\n<p>This is after it</p></body>";
         checkTransformation(original, expected);
     }
 

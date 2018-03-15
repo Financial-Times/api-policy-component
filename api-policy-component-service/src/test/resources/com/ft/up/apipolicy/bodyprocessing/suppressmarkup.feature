@@ -30,4 +30,7 @@ This is an overview of how the various configuration rules work.
    | <ft-content data-embedded="true" type="http://www.ft.com/ontology/content/MediaResource" url="http://api.ft.com/content/807a95c5-87c3-3aee-9239-387f6dc32a60"></ft-content>|
    # promoboxes
    | <promo-box><promo-title><p><a href="http://www.ft.com/reports/ft-500-2011" title="www.ft.com">FT 500</a></p></promo-title><promo-headline><p>Headline</p></promo-headline><promo-image><content data-embedded="true" id="432b5632-9e79-11e0-0a0f-978e959e1689" type="http://www.ft.com/ontology/content/ImageSet"></content></promo-image><promo-intro><p>The risers and fallers in our annual list of the world’s biggest companies</p></promo-intro><promo-link><p><a href="http://www.ft.com/cms/s/0/0bdf4bb6-6676-11e4-8bf6-00144feabdc0.html"></a></p></promo-link></promo-box> |
-   | <ft-related type="http://www.ft.com/ontology/content/Article" url="api.ft.com/content/abc123">Profile of the president</ft-related>|
+   # marketdata
+   | <marketdata figicode="somefigicode" startdata="some date" live-until="publish date + 1 week" /> |
+   # podcast-promo
+   | <podcast-promo id="16ec6a72-d5db-4322-96c6-314b051eb978"><h2>Optional Podcast title here</h2><p>Optional Podcast description here</p></podcast-promo> |
