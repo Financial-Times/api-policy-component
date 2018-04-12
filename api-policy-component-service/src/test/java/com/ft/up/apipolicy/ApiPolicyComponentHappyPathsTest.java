@@ -475,7 +475,7 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
 
             Map<String, Object> result = expectOKResponseWithJSON(response);
 
-            assertWebUrl(result, "http://www.ft.com/fastft/220322");
+            assertWebUrl(result, "https://www.ft.com/fastft/220322");
 
         } finally {
             response.close();
@@ -527,7 +527,7 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
 
             Map<String, Object> result = expectOKResponseWithJSON(response);
 
-            assertWebUrl(result, "http://www.ft.com/fastft/220322");
+            assertWebUrl(result, "https://www.ft.com/fastft/220322");
 
         } finally {
             response.close();

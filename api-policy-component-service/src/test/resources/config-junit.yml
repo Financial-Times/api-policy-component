@@ -8,8 +8,8 @@ varnish:
 
 pipeline:
   webUrlTemplates:
-    "http://www.ft.com/ontology/origin/FTComMethode" : "http://www.ft.com/cms/s/{{identifierValue}}.html"
-    "http://www.ft.com/ontology/origin/FT-CLAMO"  : "http://www.ft.com/fastft/{{identifierValue}}"
+    "http://www.ft.com/ontology/origin/FTComMethode" : "https://www.ft.com/content/{{identifierValue}}"
+    "http://www.ft.com/ontology/origin/FT-CLAMO"  : "https://www.ft.com/fastft/{{identifierValue}}"
 
 policyBrandsMapper:
   policyFilterParameterList:

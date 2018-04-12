@@ -8,12 +8,12 @@ varnish:
 
 pipeline:
   webUrlTemplates:
-    "http://www.ft.com/ontology/origin/FTComMethode" : "http://www.ft.com/cms/s/{{identifierValue}}.html"
-    "http://www.ft.com/ontology/origin/FT-CLAMO"  : "http://www.ft.com/fastft?post={{identifierValue}}"
+    "http://www.ft.com/ontology/origin/FTComMethode" : "https://www.ft.com/content/{{identifierValue}}"
+    "http://www.ft.com/ontology/origin/FT-CLAMO"  : "https://www.ft.com/fastft?post={{identifierValue}}"
     "http://www.ft.com/ontology/origin/FT-LABS-WP-1-24" : "{{identifierValue}}"
     "http://www.ft.com/ontology/origin/FT-LABS-WP-1-91" : "{{identifierValue}}"
-    "http://api.ft.com/system/FTCOM-METHODE" : "http://www.ft.com/cms/s/{{identifierValue}}.html"
-    "http://api.ft.com/system/FT-CLAMO"  : "http://www.ft.com/fastft?post={{identifierValue}}"
+    "http://api.ft.com/system/FTCOM-METHODE" : "https://www.ft.com/content/{{identifierValue}}"
+    "http://api.ft.com/system/FT-CLAMO"  : "https://www.ft.com/fastft?post={{identifierValue}}"
     "http://api.ft.com/system/FT-LABS-WP-1-[0-9]+" : "{{identifierValue}}"
     "http://api.ft.com/system/NEXT-VIDEO-EDITOR" : "https://www.ft.com/video/{{identifierValue}}"
 
