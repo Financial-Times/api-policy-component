@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/api-policy-component
     docker:
-      - image: maven
+      - image: maven:3.5.0
     steps:
       - checkout
       - run:
