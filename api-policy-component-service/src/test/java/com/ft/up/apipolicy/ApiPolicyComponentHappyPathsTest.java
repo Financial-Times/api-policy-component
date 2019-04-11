@@ -666,7 +666,7 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
     }
 
     @Test
-    public void givenNoFastFtRelatedPolicyShouldGetNotificationsWithNoBrandParameter() throws IOException {
+    public void givenNoFastFtRelatedPolicyShouldGetNotifications() throws IOException {
         givenEverythingSetup();
         // build a URL on localhost corresponding to PLAIN_NOTIFICATIONS_FEED_URI
         URI facadeUri = sinceSomeDateFromFacade();
