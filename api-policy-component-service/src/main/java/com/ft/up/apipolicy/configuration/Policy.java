@@ -1,9 +1,6 @@
 package com.ft.up.apipolicy.configuration;
 
 public enum Policy {
-
-    FASTFT_CONTENT_ONLY("FASTFT_CONTENT_ONLY"), // used in config file, so keeping here as well
-    EXCLUDE_FASTFT_CONTENT("EXCLUDE_FASTFT_CONTENT"), // used in config file, so keeping here as well
     INCLUDE_RICH_CONTENT("INCLUDE_RICH_CONTENT"),
     INCLUDE_IDENTIFIERS("INCLUDE_IDENTIFIERS"),
     INCLUDE_COMMENTS("INCLUDE_COMMENTS"),
