@@ -27,3 +27,4 @@ workflows:
       - dockerfile:
           requires:
             - build
+  erseyRequestForwarderTest.java
