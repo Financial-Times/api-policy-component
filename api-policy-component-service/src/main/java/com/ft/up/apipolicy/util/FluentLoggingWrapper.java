@@ -8,10 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,8 +31,8 @@ public class FluentLoggingWrapper {
     public static final String CONTENT_TYPE = "content-type";
     public static final String STATUS = "status";
     public static final String USER_AGENT = "userAgent";
-    public static final String EXCEPTION = "exception: ";
-    public static final String STACKTRACE = "stacktrace: ";
+    public static final String EXCEPTION = "exception_message";
+    public static final String STACKTRACE = "stacktrace_log";
     public static final String CLIENT = "client";
     public static final String METHOD = "method";
     public static final String HOST = "host";
@@ -77,14 +74,17 @@ public class FluentLoggingWrapper {
         return this;
     }
 
-    public FluentLoggingWrapper withException(Exception e) {
-        if (nonNull(e)) {
-            withField(EXCEPTION, e.getLocalizedMessage());
+    public FluentLoggingWrapper withException(Throwable t) {
+        if (nonNull(t)) {
+            withField(EXCEPTION, t.getMessage());
 
             if (logger.isDebugEnabled()) {
-                withField(STACKTRACE, getStackTrace(e));
+                withField(STACKTRACE, getStackTrace(t));
             }
+        } else {
+            withField(EXCEPTION, "Exception was null");
         }
+
         return this;
     }
 
@@ -194,7 +194,6 @@ public class FluentLoggingWrapper {
         iy.yielding(items);
 
         items = new HashMap<>();
-        methodName = "";
 
         return iy;
     }

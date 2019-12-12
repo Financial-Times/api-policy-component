@@ -1,6 +1,5 @@
-package com.ft.up.apipolicy.transformer;
+package com.ft.up.apipolicy;
 
-import com.ft.up.apipolicy.ApiPolicyExceptionMapper;
 import org.junit.Test;
 
 import javax.ws.rs.NotFoundException;
@@ -21,7 +20,17 @@ public class ApiPolicyExceptionMapperTest {
     private final ApiPolicyExceptionMapper exceptionMapper = new ApiPolicyExceptionMapper();
 
     @Test
-    public void testExceptionMapping() {
+    public void testExceptionMappingForNull() {
+        assertExceptionMapping(null, SC_INTERNAL_SERVER_ERROR, "server error");
+    }
+
+    @Test
+    public void testExceptionMappingForErrors() {
+        assertExceptionMapping(new Error(), SC_INTERNAL_SERVER_ERROR, "server error");
+    }
+
+    @Test
+    public void testExceptionMappingForExceptions() {
         assertExceptionMapping(new NotFoundException(), SC_NOT_FOUND, "404 Not Found");
         assertExceptionMapping(new WebApplicationException(SC_INTERNAL_SERVER_ERROR), SC_INTERNAL_SERVER_ERROR,
                 "HTTP 500 Internal Server Error");
@@ -32,7 +41,7 @@ public class ApiPolicyExceptionMapperTest {
         assertExceptionMapping(new Exception(), SC_INTERNAL_SERVER_ERROR, "server error");
     }
 
-    private void assertExceptionMapping(Exception e, int status, String message) {
+    private void assertExceptionMapping(Throwable e, int status, String message) {
         Response response = exceptionMapper.toResponse(e);
         assertThat(response.getStatus()).isEqualTo(status);
         assertThat(response.getEntity().toString()).isEqualTo(format("{\"message\":\"%s\"}", message));

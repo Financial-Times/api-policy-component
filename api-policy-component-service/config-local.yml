@@ -50,7 +50,6 @@ logging:
     org.eclipse.jetty: "OFF"
     org.glassfish.jersey.client: "OFF"
     sun.net.www.protocol.http: "OFF"
-    com.ft.jerseyhttpwrapper.AttemptLogger: "OFF"
     com.ft.api.util.transactionid: "OFF"
     #    Switch this to INFO instead of "OFF" if you want to see stack traces NOT in JSON format
     com.ft.api.jaxrs.errors: "OFF"

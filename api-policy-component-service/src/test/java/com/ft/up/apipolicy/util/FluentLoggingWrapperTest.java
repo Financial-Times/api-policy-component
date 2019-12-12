@@ -154,8 +154,8 @@ public class FluentLoggingWrapperTest {
                 LoggingEvent loggingEvent = (LoggingEvent) argument;
                 String content = loggingEvent.getFormattedMessage();
                 return containsBasicJSONFields(content)
-                        && containsFieldInJSON("\"exception: \"", content)
-                        && containsFieldInJSON("\"stacktrace: \"", content);
+                        && containsFieldInJSON("\"exception_message\"", content)
+                        && containsFieldInJSON("\"stacktrace_log\"", content);
             }
         }));
     }
@@ -165,7 +165,11 @@ public class FluentLoggingWrapperTest {
     public void logVerifyUnwantedFieldsAreNotPresent() {
         final Appender mockAppender = getAppender();
 
-        log.build().logDebug();
+        log.withTransactionId(null)
+                .withField(MESSAGE, "")
+                .withField(UUID, null)
+                .withException(null)
+                .build().logDebug();
 
         verify(mockAppender).doAppend(argThat(new ArgumentMatcher() {
             @Override
@@ -174,6 +178,7 @@ public class FluentLoggingWrapperTest {
                 String content = loggingEvent.getFormattedMessage();
                 return containsBasicJSONFields(content)
                         && containsFieldInJSON("\"logLevel\":\"DEBUG\"", content)
+                        && containsFieldInJSON("\"exception_message\":\"Exception was null\"", content)
                         && !containsFieldInJSON("\"transaction_id\":\"tid_test1\"", content)
                         && !containsFieldInJSON("\"msg\":\"test message 1\"", content)
                         && !containsFieldInJSON("\"uuid\":\"7398d82a-6e76-11dd-a80a-0000779fd18c\"", content)
@@ -187,8 +192,7 @@ public class FluentLoggingWrapperTest {
                         && !containsFieldInJSON("\"client\":\"test client\"", content)
                         && !containsFieldInJSON("\"host\":\"test host\"", content)
                         && !containsFieldInJSON("\"protocol\":\"HTTP/1.1\"", content)
-                        && !containsFieldInJSON("\"exception: \"", content)
-                        && !containsFieldInJSON("\"stacktrace: \"", content);
+                        && !containsFieldInJSON("\"stacktrace_log\"", content);
             }
         }));
     }
