@@ -1,1 +1,73 @@
-{"id":"http://www.ft.com/thing/273563f3-95a0-4f00-8966-6973c0111923","type":"http://www.ft.com/ontology/content/Article","bodyXML":"<body><ft-contenttype=\"http://www.ft.com/ontology/content/ImageSet\"url=\"http://api.ft.com/content/5991fb44-f1eb-11e6-0b88-66d48f259d41\"data-embedded=\"true\"></ft-content></body>","title":"Ring","byline":"Testarticle","publishedDate":"2015-02-03T12:58:00.000Z","lastModified":"2017-02-13T17:51:57.723Z","identifiers":[{"authority":"http://www.ft.com/ontology/origin/FTComMethode","identifierValue":"273563f3-95a0-4f00-8966-6973c0111923"}],"requestUrl":"http://localhost:9090/content/273563f3-95a0-4f00-8966-6973c0111923","brands":["http://api.ft.com/things/273563f3-95a0-4f00-8966-6973c0111923"],"mainImage":{"id":"http://api.ft.com/content/5991fb44-f1eb-11e6-0b88-66d48f259d41","type":"http://www.ft.com/ontology/content/ImageSet","apiUrl":"http://api.ft.com/content/5991fb44-f1eb-11e6-0b88-66d48f259d41","publishedDate":"2015-02-03T12:58:00.000Z","lastModified":"2017-02-13T17:51:57.723Z","members":[{"id":"http://api.ft.com/content/5991fb44-f1eb-11e6-95ee-f14e55513608","type":"http://www.ft.com/ontology/content/MediaResource","apiUrl":"http://api.ft.com/content/5991fb44-f1eb-11e6-95ee-f14e55513608","publishedDate":"2015-02-03T12:58:00.000Z","lastModified":"2017-02-13T17:51:57.723Z","canBeSyndicated":"verify"}],"canBeSyndicated":"verify"},"embeds":[{"id":"http://api.ft.com/content/5991fb44-f1eb-11e6-0b88-66d48f259d41","type":"http://www.ft.com/ontology/content/ImageSet","apiUrl":"http://test.api.ft.com/content/5991fb44-f1eb-11e6-0b88-66d48f259d41","publishedDate":"2015-02-03T12:58:00.000Z","lastModified":"2017-02-13T17:51:57.723Z","members":[{"id":"http://test.api.ft.com/content/5991fb44-f1eb-11e6-95ee-f14e55513608","type":"http://www.ft.com/ontology/content/MediaResource","apiUrl":"http://test.api.ft.com/content/5991fb44-f1eb-11e6-95ee-f14e55513608","publishedDate":"2015-02-03T12:58:00.000Z","lastModified":"2017-02-13T17:51:57.723Z","canBeSyndicated":"verify"}],"canBeSyndicated":"verify"}],"alternativeImages":{"promotionalImage":{"id":"http://test.api.ft.com/content/5991fb44-f1eb-11e6-95ee-f14e55513608","type":"http://www.ft.com/ontology/content/MediaResource","apiUrl":"http://test.api.ft.com/content/5991fb44-f1eb-11e6-95ee-f14e55513608","publishedDate":"2015-02-03T12:58:00.000Z","lastModified":"2017-02-13T17:51:57.723Z","canBeSyndicated":"verify"}},"comments":{"enabled":true},"canBeSyndicated":"verify"}
+{
+  "id": "http://www.ft.com/thing/273563f3-95a0-4f00-8966-6973c0111923",
+  "type": "http://www.ft.com/ontology/content/Article",
+  "bodyXML": "<body><ft-contenttype=\"http://www.ft.com/ontology/content/ImageSet\"url=\"http://api.ft.com/content/5991fb44-f1eb-11e6-0b88-66d48f259d41\"data-embedded=\"true\"></ft-content></body>",
+  "title": "Ring",
+  "byline": "Testarticle",
+  "publishedDate": "2015-02-03T12:58:00.000Z",
+  "lastModified": "2017-02-13T17:51:57.723Z",
+  "identifiers": [
+    {
+      "authority": "http://www.ft.com/ontology/origin/FTComMethode",
+      "identifierValue": "273563f3-95a0-4f00-8966-6973c0111923"
+    }
+  ],
+  "requestUrl": "http://localhost:9090/content/273563f3-95a0-4f00-8966-6973c0111923",
+  "brands": [
+    "http://api.ft.com/things/273563f3-95a0-4f00-8966-6973c0111923"
+  ],
+  "mainImage": {
+    "id": "http://api.ft.com/content/5991fb44-f1eb-11e6-0b88-66d48f259d41",
+    "type": "http://www.ft.com/ontology/content/ImageSet",
+    "apiUrl": "http://api.ft.com/content/5991fb44-f1eb-11e6-0b88-66d48f259d41",
+    "publishedDate": "2015-02-03T12:58:00.000Z",
+    "lastModified": "2017-02-13T17:51:57.723Z",
+    "members": [
+      {
+        "id": "http://api.ft.com/content/5991fb44-f1eb-11e6-95ee-f14e55513608",
+        "type": "http://www.ft.com/ontology/content/MediaResource",
+        "apiUrl": "http://api.ft.com/content/5991fb44-f1eb-11e6-95ee-f14e55513608",
+        "publishedDate": "2015-02-03T12:58:00.000Z",
+        "lastModified": "2017-02-13T17:51:57.723Z",
+        "canBeSyndicated": "verify"
+      }
+    ],
+    "canBeSyndicated": "verify"
+  },
+  "embeds": [
+    {
+      "id": "http://api.ft.com/content/5991fb44-f1eb-11e6-0b88-66d48f259d41",
+      "type": "http://www.ft.com/ontology/content/ImageSet",
+      "apiUrl": "http://test.api.ft.com/content/5991fb44-f1eb-11e6-0b88-66d48f259d41",
+      "publishedDate": "2015-02-03T12:58:00.000Z",
+      "lastModified": "2017-02-13T17:51:57.723Z",
+      "members": [
+        {
+          "id": "http://test.api.ft.com/content/5991fb44-f1eb-11e6-95ee-f14e55513608",
+          "type": "http://www.ft.com/ontology/content/MediaResource",
+          "apiUrl": "http://test.api.ft.com/content/5991fb44-f1eb-11e6-95ee-f14e55513608",
+          "publishedDate": "2015-02-03T12:58:00.000Z",
+          "lastModified": "2017-02-13T17:51:57.723Z",
+          "canBeSyndicated": "verify"
+        }
+      ],
+      "canBeSyndicated": "verify"
+    }
+  ],
+  "alternativeImages": {
+    "promotionalImage": {
+      "id": "http://test.api.ft.com/content/5991fb44-f1eb-11e6-95ee-f14e55513608",
+      "type": "http://www.ft.com/ontology/content/MediaResource",
+      "apiUrl": "http://test.api.ft.com/content/5991fb44-f1eb-11e6-95ee-f14e55513608",
+      "publishedDate": "2015-02-03T12:58:00.000Z",
+      "lastModified": "2017-02-13T17:51:57.723Z",
+      "canBeSyndicated": "verify"
+    }
+  },
+  "comments": {
+    "enabled": true
+  },
+  "canBeSyndicated": "verify"
+}
+
+

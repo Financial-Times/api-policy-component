@@ -1,10 +1,13 @@
 package com.ft.up.apipolicy.filters;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ft.up.apipolicy.JsonConverter;
 import com.ft.up.apipolicy.configuration.Policy;
 import com.ft.up.apipolicy.pipeline.HttpPipelineChain;
@@ -27,10 +30,11 @@ public class AddSyndicationTest {
 
     private final HttpPipelineChain mockChain = mock(HttpPipelineChain.class);
     private AddSyndication filter = new AddSyndication(JsonConverter.testConverter());
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private static byte[] readFileBytes(final String path) {
         try {
-            return Files.readAllBytes(Paths.get(SuppressJsonPropertiesFilterTest.class.getClassLoader().getResource(path).toURI()));
+            return Files.readAllBytes(Paths.get(AddSyndicationTest.class.getClassLoader().getResource(path).toURI()));
         } catch (IOException | URISyntaxException ex) {
             throw new RuntimeException(ex);
         }
@@ -82,48 +86,52 @@ public class AddSyndicationTest {
     }
 
     @Test
-    public void shouldHaveOriginalFieldIfPresentAndPolicy() {
+    public void shouldHaveOriginalFieldIfPresentAndPolicy() throws IOException {
         final Set<String> policies = new HashSet<>();
         policies.add(Policy.INTERNAL_UNSTABLE.getHeaderValue());
         final MutableRequest request = new MutableRequest(policies, getClass().getSimpleName());
-        final byte[] responseBody = readFileBytes("sample-article-with-image.json");
-        final MutableResponse response = new MutableResponse(new MultivaluedHashMap<>(), responseBody);
-        response.setStatus(200);
-        response.getHeaders().putSingle("Content-Type", "application/json");
-        when(mockChain.callNextFilter(request)).thenReturn(response);
+        final MutableResponse initialResponse = new MutableResponse(new MultivaluedHashMap<>(), readFileBytes("sample-article-with-image.json"));
+        initialResponse.setStatus(200);
+        initialResponse.getHeaders().putSingle("Content-Type", "application/json");
+        when(mockChain.callNextFilter(request)).thenReturn(initialResponse);
 
-        MutableResponse filteredResponse = filter.processRequest(request, mockChain);
+        MutableResponse actualResponse = filter.processRequest(request, mockChain);
 
-        assertThat(new String(filteredResponse.getEntity()), is(new String(responseBody)));
+        final JsonNode actualTree = MAPPER.readTree(actualResponse.getEntityAsString());
+        final JsonNode expectedTree = MAPPER.readTree(initialResponse.getEntityAsString());
+
+        assertThat(actualTree, equalTo(expectedTree));
     }
 
     @Test
-    public void shouldShowOriginalFieldIfPresentRegardlessPolicy() {
+    public void shouldShowOriginalFieldIfPresentRegardlessPolicy() throws IOException {
         final MutableRequest request = new MutableRequest(new HashSet<>(), getClass().getSimpleName());
-        final byte[] responseBody = readFileBytes("sample-article-with-image.json");
-        final byte[] filteredResponseBody = readFileBytes("sample-article-with-image.json");
-        final MutableResponse response = new MutableResponse(new MultivaluedHashMap<>(), responseBody);
-        response.setStatus(200);
-        response.getHeaders().putSingle("Content-Type", "application/json");
-        when(mockChain.callNextFilter(request)).thenReturn(response);
+        final MutableResponse initialResponse = new MutableResponse(new MultivaluedHashMap<>(), readFileBytes("sample-article-with-image.json"));
+        final MutableResponse expectedResponse = new MutableResponse(new MultivaluedHashMap<>(), readFileBytes("sample-article-with-image.json"));
+        initialResponse.setStatus(200);
+        initialResponse.getHeaders().putSingle("Content-Type", "application/json");
+        when(mockChain.callNextFilter(request)).thenReturn(initialResponse);
 
-        MutableResponse filteredResponse = filter.processRequest(request, mockChain);
+        MutableResponse actualResponse = filter.processRequest(request, mockChain);
+        final JsonNode actualTree = MAPPER.readTree(actualResponse.getEntityAsString());
+        final JsonNode expectedTree = MAPPER.readTree(expectedResponse.getEntityAsString());
 
-        assertThat(new String(filteredResponse.getEntity()), is(new String(filteredResponseBody)));
+        assertThat(actualTree, equalTo(expectedTree));
     }
 
     @Test
-    public void shouldHaveFieldAddedIfMissingRegardlessPolicy() {
+    public void shouldHaveFieldAddedIfMissingRegardlessPolicy() throws IOException {
         final MutableRequest request = new MutableRequest(new HashSet<>(), getClass().getSimpleName());
-        final byte[] responseBody = readFileBytes("sample-article-no-canBeSyndicated.json");
-        final byte[] filteredResponseBody = readFileBytes("sample-article-with-image.json");
-        final MutableResponse response = new MutableResponse(new MultivaluedHashMap<>(), responseBody);
-        response.setStatus(200);
-        response.getHeaders().putSingle("Content-Type", "application/json");
-        when(mockChain.callNextFilter(request)).thenReturn(response);
+        final MutableResponse initialResponse = new MutableResponse(new MultivaluedHashMap<>(), readFileBytes("sample-article-no-canBeSyndicated.json"));
+        final MutableResponse expectedResponse = new MutableResponse(new MultivaluedHashMap<>(), readFileBytes("sample-article-with-image.json"));
+        initialResponse.setStatus(200);
+        initialResponse.getHeaders().putSingle("Content-Type", "application/json");
+        when(mockChain.callNextFilter(request)).thenReturn(initialResponse);
 
-        MutableResponse filteredResponse = filter.processRequest(request, mockChain);
+        MutableResponse actualResponse = filter.processRequest(request, mockChain);
+        final JsonNode actualTree = MAPPER.readTree(actualResponse.getEntityAsString());
+        final JsonNode expectedTree = MAPPER.readTree(expectedResponse.getEntityAsString());
 
-        assertThat(new String(filteredResponse.getEntity()), is(new String(filteredResponseBody)));
+        assertThat(actualTree, equalTo(expectedTree));
     }
 }

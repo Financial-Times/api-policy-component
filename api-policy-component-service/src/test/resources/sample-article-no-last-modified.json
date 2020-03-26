@@ -12,5 +12,7 @@
     }
   ],
   "requestUrl": "http://localhost:9090/content/273563f3-95a0-4f00-8966-6973c0111923",
-  "brands": ["http://api.ft.com/things/273563f3-95a0-4f00-8966-6973c0111923"]
+  "brands": [
+    "http://api.ft.com/things/273563f3-95a0-4f00-8966-6973c0111923"
+  ]
 }
