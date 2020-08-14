@@ -11,17 +11,15 @@ import com.ft.up.apipolicy.pipeline.HttpPipeline;
 import com.ft.up.apipolicy.pipeline.HttpPipelineChain;
 import com.ft.up.apipolicy.pipeline.MutableRequest;
 import com.ft.up.apipolicy.pipeline.MutableResponse;
+import java.util.Arrays;
+import java.util.Collections;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
-
-import java.util.Arrays;
-import java.util.Collections;
 
 /**
  * AddBrandFilterParametersTest
@@ -31,63 +29,60 @@ import java.util.Collections;
 @RunWith(MockitoJUnitRunner.class)
 public class AddBrandFilterParametersTest {
 
+  public static final String ERROR_RESPONSE = "{ \"message\" : \"Error\" }";
 
-    public final static String ERROR_RESPONSE = "{ \"message\" : \"Error\" }";
+  public static final String MINIMAL_EXAMPLE_RESPONSE =
+      "{ \"requestUrl\": \"http://example.org/content/100?forBrand=ONE&notForBrand=TWO\" }";
 
-    public final static String MINIMAL_EXAMPLE_RESPONSE = "{ \"requestUrl\": \"http://example.org/content/100?forBrand=ONE&notForBrand=TWO\" }";
+  @Mock private HttpPipelineChain mockChain;
 
+  @Mock private PolicyBrandsResolver policyBrandsResolver;
 
-    @Mock
-    private HttpPipelineChain mockChain;
+  private MutableRequest exampleRequest =
+      new MutableRequest(Collections.singleton("TEST"), getClass().getSimpleName());
 
-    @Mock
-    private PolicyBrandsResolver policyBrandsResolver;
+  private MutableResponse exampleErrorResponse;
+  private MutableResponse minimalExampleResponse;
 
+  @Before
+  public void setUpExamples() {
 
-    private MutableRequest exampleRequest = new MutableRequest(Collections.singleton("TEST"),getClass().getSimpleName());
+    MultivaluedMap<String, Object> allHeaders = new MultivaluedHashMap<>();
+    allHeaders.put(
+        HttpPipeline.POLICY_HEADER_NAME,
+        Arrays.asList("FASTFT_CONTENT_ONLY", "EXCLUDE_FASTFT_CONTENT"));
 
-    private MutableResponse exampleErrorResponse;
-    private MutableResponse minimalExampleResponse;
+    exampleErrorResponse = new MutableResponse(allHeaders, ERROR_RESPONSE.getBytes());
+    exampleErrorResponse.setStatus(500);
 
-    @Before
-    public void setUpExamples() {
+    minimalExampleResponse = new MutableResponse(allHeaders, MINIMAL_EXAMPLE_RESPONSE.getBytes());
+    minimalExampleResponse.setStatus(200);
+  }
 
-        MultivaluedMap<String,Object> allHeaders = new MultivaluedHashMap<>();
-        allHeaders.put(HttpPipeline.POLICY_HEADER_NAME, Arrays.asList("FASTFT_CONTENT_ONLY", "EXCLUDE_FASTFT_CONTENT"));
+  @Test
+  public void shouldNotProcessErrorResponse() {
 
-        exampleErrorResponse = new MutableResponse(allHeaders,ERROR_RESPONSE.getBytes());
-        exampleErrorResponse.setStatus(500);
+    when(mockChain.callNextFilter(exampleRequest)).thenReturn(exampleErrorResponse);
 
-        minimalExampleResponse = new MutableResponse(allHeaders, MINIMAL_EXAMPLE_RESPONSE.getBytes());
-        minimalExampleResponse.setStatus(200);
+    AddBrandFilterParameters filter =
+        new AddBrandFilterParameters(JsonConverter.testConverter(), policyBrandsResolver);
 
-    }
+    MutableResponse response = filter.processRequest(exampleRequest, mockChain);
 
-    @Test
-    public void shouldNotProcessErrorResponse() {
+    assertThat(response.getEntity(), is(ERROR_RESPONSE.getBytes()));
+  }
 
-        when(mockChain.callNextFilter(exampleRequest)).thenReturn(exampleErrorResponse);
+  @Test
+  public void shouldNotAddQueryParamsToResponse() {
 
-        AddBrandFilterParameters filter  = new AddBrandFilterParameters(JsonConverter.testConverter(), policyBrandsResolver);
+    when(mockChain.callNextFilter(exampleRequest)).thenReturn(minimalExampleResponse);
 
-        MutableResponse response = filter.processRequest(exampleRequest,mockChain);
+    AddBrandFilterParameters filter =
+        new AddBrandFilterParameters(JsonConverter.testConverter(), policyBrandsResolver);
 
-        assertThat(response.getEntity(),is(ERROR_RESPONSE.getBytes()));
+    MutableResponse response = filter.processRequest(exampleRequest, mockChain);
 
-    }
-
-    @Test
-    public void shouldNotAddQueryParamsToResponse() {
-
-        when(mockChain.callNextFilter(exampleRequest)).thenReturn(minimalExampleResponse);
-
-        AddBrandFilterParameters filter  = new AddBrandFilterParameters(JsonConverter.testConverter(), policyBrandsResolver);
-
-        MutableResponse response = filter.processRequest(exampleRequest,mockChain);
-
-        assertThat(response.getEntityAsString(),not(containsString("forBrand")));
-        assertThat(response.getEntityAsString(),not(containsString("notForBrand")));
-
-    }
-
+    assertThat(response.getEntityAsString(), not(containsString("forBrand")));
+    assertThat(response.getEntityAsString(), not(containsString("notForBrand")));
+  }
 }

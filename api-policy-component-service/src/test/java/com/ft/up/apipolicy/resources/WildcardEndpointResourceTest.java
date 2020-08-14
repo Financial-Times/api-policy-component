@@ -18,20 +18,6 @@ import com.ft.up.apipolicy.pipeline.MutableHttpTranslator;
 import com.ft.up.apipolicy.pipeline.MutableRequest;
 import com.ft.up.apipolicy.pipeline.MutableResponse;
 import com.ft.up.apipolicy.pipeline.RequestForwarder;
-
-import org.apache.http.HttpStatus;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
-import javax.servlet.ReadListener;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -43,162 +29,175 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import javax.servlet.ReadListener;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import org.apache.http.HttpStatus;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class WildcardEndpointResourceTest {
-    
 
-    @Rule
-    public org.junit.rules.ExpectedException expectedException = ExpectedException.none();
+  @Rule public org.junit.rules.ExpectedException expectedException = ExpectedException.none();
 
-	private WildcardEndpointResource wildcardEndpointResource;
-	private HttpServletRequest request;
-	private UriInfo uriInfo;
-	private HttpPipeline contentPipeline;
-	private HttpPipeline notificationsPipeline;
-	private HttpPipeline defaultPipeline;
-	private HttpPipeline suggestPipeline;
+  private WildcardEndpointResource wildcardEndpointResource;
+  private HttpServletRequest request;
+  private UriInfo uriInfo;
+  private HttpPipeline contentPipeline;
+  private HttpPipeline notificationsPipeline;
+  private HttpPipeline defaultPipeline;
+  private HttpPipeline suggestPipeline;
 
-    private static final URI LOCALHOST = URI.create("http://localhost");
+  private static final URI LOCALHOST = URI.create("http://localhost");
 
-	@Before
-	public void setup() throws IOException {
-		RequestForwarder requestForwarder = mock(RequestForwarder.class);
-		MutableResponse mutableResponse = new MutableResponse(new MultivaluedHashMap<>(), "response".getBytes());
-		when(requestForwarder.forwardRequest(any(MutableRequest.class))).thenReturn(mutableResponse);
+  @Before
+  public void setup() throws IOException {
+    RequestForwarder requestForwarder = mock(RequestForwarder.class);
+    MutableResponse mutableResponse =
+        new MutableResponse(new MultivaluedHashMap<>(), "response".getBytes());
+    when(requestForwarder.forwardRequest(any(MutableRequest.class))).thenReturn(mutableResponse);
 
-		SortedSet<KnownEndpoint> knownEndpoints = new TreeSet<>();
+    SortedSet<KnownEndpoint> knownEndpoints = new TreeSet<>();
 
-        ApiFilter mockFilter = new DummyFilter();
+    ApiFilter mockFilter = new DummyFilter();
 
-        contentPipeline = spy(new HttpPipeline(requestForwarder , mockFilter ));
-		knownEndpoints.add(new KnownEndpoint("^/content/.*", contentPipeline));
+    contentPipeline = spy(new HttpPipeline(requestForwarder, mockFilter));
+    knownEndpoints.add(new KnownEndpoint("^/content/.*", contentPipeline));
 
-        notificationsPipeline = spy(new HttpPipeline(requestForwarder, mockFilter));
-		knownEndpoints.add(new KnownEndpoint("^/content/notifications.*", notificationsPipeline));
-		
-		//DEFAULT CASE
-		defaultPipeline = spy(new HttpPipeline(requestForwarder, mockFilter));
-		knownEndpoints.add(new KnownEndpoint("^/.*", defaultPipeline));
+    notificationsPipeline = spy(new HttpPipeline(requestForwarder, mockFilter));
+    knownEndpoints.add(new KnownEndpoint("^/content/notifications.*", notificationsPipeline));
 
-		SortedSet<KnownEndpoint> knownWhitelistedNonIdempotentEndpoints = new TreeSet<>();
+    // DEFAULT CASE
+    defaultPipeline = spy(new HttpPipeline(requestForwarder, mockFilter));
+    knownEndpoints.add(new KnownEndpoint("^/.*", defaultPipeline));
 
-        suggestPipeline = spy(new HttpPipeline(requestForwarder , mockFilter ));
-        knownWhitelistedNonIdempotentEndpoints.add(new KnownEndpoint("^/suggest/.*", suggestPipeline));
-		
-		wildcardEndpointResource = new WildcardEndpointResource(new RequestHandler(new MutableHttpTranslator(), knownEndpoints),
-		        new RequestHandler(new MutableHttpTranslator(), knownWhitelistedNonIdempotentEndpoints));
+    SortedSet<KnownEndpoint> knownWhitelistedNonIdempotentEndpoints = new TreeSet<>();
 
-		request = mock(HttpServletRequest.class);
-		when(request.getHeaderNames()).thenReturn(Collections.<String>emptyEnumeration());
+    suggestPipeline = spy(new HttpPipeline(requestForwarder, mockFilter));
+    knownWhitelistedNonIdempotentEndpoints.add(new KnownEndpoint("^/suggest/.*", suggestPipeline));
 
-		uriInfo = mock(UriInfo.class);
-	}
+    wildcardEndpointResource =
+        new WildcardEndpointResource(
+            new RequestHandler(new MutableHttpTranslator(), knownEndpoints),
+            new RequestHandler(
+                new MutableHttpTranslator(), knownWhitelistedNonIdempotentEndpoints));
 
-	@Test
-	public void shouldUseNotificationsPipelineWhenNotificationsUrlPassed() throws URISyntaxException {
-        mockEnvironmentForRequestTo("/content/notifications");
-        when(request.getMethod()).thenReturn("GET");
+    request = mock(HttpServletRequest.class);
+    when(request.getHeaderNames()).thenReturn(Collections.<String>emptyEnumeration());
 
-		wildcardEndpointResource.get(request, uriInfo);
-		verify(contentPipeline, never()).forwardRequest(any(MutableRequest.class));
-		verify(notificationsPipeline, times(1)).forwardRequest(any(MutableRequest.class));
-	}
+    uriInfo = mock(UriInfo.class);
+  }
 
-    private StringBuffer absoluteUriFor(URI notificationsPath) {
-        return new StringBuffer(LOCALHOST.resolve(notificationsPath).toString());
-    }
+  @Test
+  public void shouldUseNotificationsPipelineWhenNotificationsUrlPassed() throws URISyntaxException {
+    mockEnvironmentForRequestTo("/content/notifications");
+    when(request.getMethod()).thenReturn("GET");
 
-    @Test
-	public void shouldUseContentPipelineWhenContentUrlPassed() throws URISyntaxException {
-        mockEnvironmentForRequestTo("/content/54307a12-37fa-11e3-8f44-002128161462");
-        when(request.getMethod()).thenReturn("GET");
+    wildcardEndpointResource.get(request, uriInfo);
+    verify(contentPipeline, never()).forwardRequest(any(MutableRequest.class));
+    verify(notificationsPipeline, times(1)).forwardRequest(any(MutableRequest.class));
+  }
 
-		wildcardEndpointResource.get(request, uriInfo);
+  private StringBuffer absoluteUriFor(URI notificationsPath) {
+    return new StringBuffer(LOCALHOST.resolve(notificationsPath).toString());
+  }
 
-        verify(contentPipeline, times(1)).forwardRequest(any(MutableRequest.class));
-		verify(notificationsPipeline, never()).forwardRequest(any(MutableRequest.class));
-	}
+  @Test
+  public void shouldUseContentPipelineWhenContentUrlPassed() throws URISyntaxException {
+    mockEnvironmentForRequestTo("/content/54307a12-37fa-11e3-8f44-002128161462");
+    when(request.getMethod()).thenReturn("GET");
 
-    private void mockEnvironmentForRequestTo(String path) throws URISyntaxException {
-        URI contentPath = new URI(path);
-        when(uriInfo.getAbsolutePath()).thenReturn(contentPath);
-        when(request.getRequestURL()).thenReturn(absoluteUriFor(contentPath));
-        when(uriInfo.getBaseUri()).thenReturn(LOCALHOST);
-        when(uriInfo.getPath()).thenReturn(path);
-    }
-    
-    @Test
-    public void shouldUseSuggestPipelineWhenSuggestUrlPassed() throws URISyntaxException, IOException {
-        mockEnvironmentForRequestTo("/suggest/54307a12-37fa-11e3-8f44-002128161462");
-        when(request.getMethod()).thenReturn("POST");
-        Object requestEntity = "{\"body\": \"text\""
-                + "}";
-        when(request.getInputStream()).thenReturn(createServletInputStream(requestEntity));
+    wildcardEndpointResource.get(request, uriInfo);
 
-        wildcardEndpointResource.post(request, uriInfo);
+    verify(contentPipeline, times(1)).forwardRequest(any(MutableRequest.class));
+    verify(notificationsPipeline, never()).forwardRequest(any(MutableRequest.class));
+  }
 
-        verify(suggestPipeline, times(1)).forwardRequest(any(MutableRequest.class));
-    }
+  private void mockEnvironmentForRequestTo(String path) throws URISyntaxException {
+    URI contentPath = new URI(path);
+    when(uriInfo.getAbsolutePath()).thenReturn(contentPath);
+    when(request.getRequestURL()).thenReturn(absoluteUriFor(contentPath));
+    when(uriInfo.getBaseUri()).thenReturn(LOCALHOST);
+    when(uriInfo.getPath()).thenReturn(path);
+  }
 
-    @Test
-	public void shouldUseDefautlPipelineWhenUnknownUrlPassedToGet() throws URISyntaxException {
-        mockEnvironmentForRequestTo("/you_ready_folks?");
-        when(request.getMethod()).thenReturn("GET");
+  @Test
+  public void shouldUseSuggestPipelineWhenSuggestUrlPassed()
+      throws URISyntaxException, IOException {
+    mockEnvironmentForRequestTo("/suggest/54307a12-37fa-11e3-8f44-002128161462");
+    when(request.getMethod()).thenReturn("POST");
+    Object requestEntity = "{\"body\": \"text\"" + "}";
+    when(request.getInputStream()).thenReturn(createServletInputStream(requestEntity));
 
-		wildcardEndpointResource.get(request, uriInfo);
+    wildcardEndpointResource.post(request, uriInfo);
 
-        verify(contentPipeline, never()).forwardRequest(any(MutableRequest.class));
-		verify(notificationsPipeline, never()).forwardRequest(any(MutableRequest.class));
-		verify(defaultPipeline, times(1)).forwardRequest(any(MutableRequest.class));
-	}
-    
+    verify(suggestPipeline, times(1)).forwardRequest(any(MutableRequest.class));
+  }
 
-    
-    @Test
-    public void shouldThrowUnsupportedRequestExceptionWhenUnknownUrlPassedToPost() throws URISyntaxException {
-        mockEnvironmentForRequestTo("/non-matching/54307a12-37fa-11e3-8f44-002128161462");
-        when(request.getMethod()).thenReturn("POST");
+  @Test
+  public void shouldUseDefautlPipelineWhenUnknownUrlPassedToGet() throws URISyntaxException {
+    mockEnvironmentForRequestTo("/you_ready_folks?");
+    when(request.getMethod()).thenReturn("GET");
 
-        Response actual = wildcardEndpointResource.post(request, uriInfo);
-        assertThat("status", actual.getStatus(), equalTo(HttpStatus.SC_METHOD_NOT_ALLOWED));
-        
-        Object entity = actual.getEntity();
-        assertThat("message", (String)((Map)entity).get("message"), containsString(
-          "Unsupported request: path [/non-matching/54307a12-37fa-11e3-8f44-002128161462] "
-          + "with method [POST]."
-            ));
-        
-        verify(suggestPipeline, never()).forwardRequest(any(MutableRequest.class));
-    }
-    
-    private ServletInputStream createServletInputStream(Object object) throws IOException {
-         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-         ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-         objectOutputStream.writeObject(object);
+    wildcardEndpointResource.get(request, uriInfo);
 
-         final InputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+    verify(contentPipeline, never()).forwardRequest(any(MutableRequest.class));
+    verify(notificationsPipeline, never()).forwardRequest(any(MutableRequest.class));
+    verify(defaultPipeline, times(1)).forwardRequest(any(MutableRequest.class));
+  }
 
-         return new ServletInputStream() {
+  @Test
+  public void shouldThrowUnsupportedRequestExceptionWhenUnknownUrlPassedToPost()
+      throws URISyntaxException {
+    mockEnvironmentForRequestTo("/non-matching/54307a12-37fa-11e3-8f44-002128161462");
+    when(request.getMethod()).thenReturn("POST");
 
-             @Override
-             public int read() throws IOException {
-                 return byteArrayInputStream.read();
-             }
+    Response actual = wildcardEndpointResource.post(request, uriInfo);
+    assertThat("status", actual.getStatus(), equalTo(HttpStatus.SC_METHOD_NOT_ALLOWED));
 
-            @Override
-            public boolean isFinished() {
-              return false;
-            }
+    Object entity = actual.getEntity();
+    assertThat(
+        "message",
+        (String) ((Map) entity).get("message"),
+        containsString(
+            "Unsupported request: path [/non-matching/54307a12-37fa-11e3-8f44-002128161462] "
+                + "with method [POST]."));
 
-            @Override
-            public boolean isReady() {
-              return false;
-            }
+    verify(suggestPipeline, never()).forwardRequest(any(MutableRequest.class));
+  }
 
-            @Override
-            public void setReadListener(ReadListener arg0) {
-            }
-         };
-     }
+  private ServletInputStream createServletInputStream(Object object) throws IOException {
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+    objectOutputStream.writeObject(object);
 
+    final InputStream byteArrayInputStream =
+        new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+
+    return new ServletInputStream() {
+
+      @Override
+      public int read() throws IOException {
+        return byteArrayInputStream.read();
+      }
+
+      @Override
+      public boolean isFinished() {
+        return false;
+      }
+
+      @Override
+      public boolean isReady() {
+        return false;
+      }
+
+      @Override
+      public void setReadListener(ReadListener arg0) {}
+    };
+  }
 }
