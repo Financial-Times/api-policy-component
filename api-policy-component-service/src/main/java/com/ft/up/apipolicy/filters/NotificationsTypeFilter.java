@@ -9,7 +9,6 @@ import com.ft.up.apipolicy.pipeline.MutableResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 
 public class NotificationsTypeFilter implements ApiFilter {
@@ -56,21 +55,13 @@ public class NotificationsTypeFilter implements ApiFilter {
 
   private void addQueryParams(MutableRequest request) {
 
-    List<String> typeParams = new ArrayList<>();
     if (request.policyIs(policy)) {
-      MultivaluedMap<String, String> queryParameters = request.getQueryParameters();
-      if (queryParameters.containsKey("type")) {
-        List<String> typeValues = queryParameters.get("type");
-        for (String v : typeValues) {
-          typeParams.add(v);
-        }
-      }
-
-      typeParams.add("all");
+      request.getQueryParameters().add(TYPE_KEY, "all");
     } else {
+      List<String> typeParams = new ArrayList<>();
       typeParams.add("article");
+      request.getQueryParameters().put(TYPE_KEY, typeParams);
     }
-    request.getQueryParameters().put(TYPE_KEY, typeParams);
   }
 
   private void stripTypeParam(Map<String, Object> content, String key) {
