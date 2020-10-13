@@ -22,7 +22,7 @@
     <findbugs.version>2.5.2</findbugs.version>
     <dw.version>1.1.3</dw.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <junit.version>4.11</junit.version>
+    <junit.version>4.13.1</junit.version>
     <maven-jxr-plugin.version>2.3</maven-jxr-plugin.version>
     <target-jdk>1.8</target-jdk>
     <mockito-core.version>1.9.5</mockito-core.version>
