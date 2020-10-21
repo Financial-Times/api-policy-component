@@ -74,6 +74,8 @@ public class ApiPolicyApplication extends Application<ApiPolicyConfiguration> {
         // Must specifically list any POST, PUT etc endpoint you want access to
         knownWhitelistedPostEndpoints.add(
                 createEndpoint(environment, configuration, "^/suggest", "suggest"));
+        knownWhitelistedPostEndpoints.add(
+                createEndpoint(environment, configuration, "^/content/advanced-search", "combined-content-search"));
 
         return knownWhitelistedPostEndpoints;
     }
