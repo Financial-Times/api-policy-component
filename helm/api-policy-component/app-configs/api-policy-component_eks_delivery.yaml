@@ -2,4 +2,3 @@
 replicaCount: 2
 service:
   name: api-policy-component
-eksCluster: true
