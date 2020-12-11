@@ -37,9 +37,6 @@ spec:
                   operator: In
                   values:
                   - delivery-varnish
-                  - public-people-api
-                  - document-store-api
-                  - internal-content-api
               topologyKey: "kubernetes.io/hostname"
       containers:
       - name: {{ .Chart.Name }}
