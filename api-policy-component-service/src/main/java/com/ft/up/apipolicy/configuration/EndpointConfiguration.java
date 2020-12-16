@@ -5,14 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
-
 import io.dropwizard.util.Duration;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class EndpointConfiguration {
-  private static final Pattern URL_REGEX = Pattern.compile("(https?:\\/\\/)?([^:]+)(:\\d+)?(:\\d+)?");
+  private static final Pattern URL_REGEX =
+      Pattern.compile("(https?:\\/\\/)?([^:]+)(:\\d+)?(:\\d+)?");
 
   private final Optional<String> shortName;
   private final String path;
@@ -23,11 +22,10 @@ public class EndpointConfiguration {
   private Duration connectionTimeout;
   private Duration timeout;
 
-  @JsonProperty
-  private boolean retryNonIdempotentMethods;
+  @JsonProperty private boolean retryNonIdempotentMethods;
 
-
-  public EndpointConfiguration(@JsonProperty("shortName") Optional<String> shortName,
+  public EndpointConfiguration(
+      @JsonProperty("shortName") Optional<String> shortName,
       @JsonProperty("path") Optional<String> path,
       @JsonProperty("primaryNodes") String primaryNodesRaw,
       @JsonProperty("timeout") Duration readTimeout,
@@ -99,7 +97,8 @@ public class EndpointConfiguration {
     if (matcher.matches()) {
       String endpointProtocol = matcher.group(1);
       if (endpointProtocol != null) {
-        endpointProtocol = endpointProtocol.substring(0, endpointProtocol.length() - 3); // must end with "://"
+        endpointProtocol =
+            endpointProtocol.substring(0, endpointProtocol.length() - 3); // must end with "://"
         protocol = endpointProtocol;
       } else {
         protocol = "http"; // default
@@ -107,16 +106,21 @@ public class EndpointConfiguration {
 
       String host = matcher.group(2);
       String endpointAppPort = matcher.group(3);
-      int port = (endpointAppPort == null) ? defaultPortFor(protocol) : Integer.parseInt(endpointAppPort.substring(1));
+      int port =
+          (endpointAppPort == null)
+              ? defaultPortFor(protocol)
+              : Integer.parseInt(endpointAppPort.substring(1));
 
       String endpointAdminPort = matcher.group(4);
-      int adminPort = (endpointAdminPort == null) ? port : Integer.parseInt(endpointAdminPort.substring(1));
+      int adminPort =
+          (endpointAdminPort == null) ? port : Integer.parseInt(endpointAdminPort.substring(1));
 
       this.host = host;
       this.port = port;
       this.adminPort = adminPort;
     } else {
-      throw new IllegalArgumentException(String.format("`%s` is not a valid endpoint value.", rawNodes));
+      throw new IllegalArgumentException(
+          String.format("`%s` is not a valid endpoint value.", rawNodes));
     }
   }
 

@@ -7,15 +7,16 @@ import com.ft.bodyprocessing.transformer.FieldTransformer;
 
 public class BodyProcessingFieldTransformer implements FieldTransformer {
 
-    private final BodyProcessorChain bodyProcessorChain;
+  private final BodyProcessorChain bodyProcessorChain;
 
-    public BodyProcessingFieldTransformer(BodyProcessorChain bodyProcessorChain) {
-        this.bodyProcessorChain = bodyProcessorChain;
-    }
+  public BodyProcessingFieldTransformer(BodyProcessorChain bodyProcessorChain) {
+    this.bodyProcessorChain = bodyProcessorChain;
+  }
 
-    @Override
-    public String transform(String originalBody, String transactionId) {
-        BodyProcessingContext bodyProcessingContext = new DefaultTransactionIdBodyProcessingContext(transactionId);
-        return bodyProcessorChain.process(originalBody, bodyProcessingContext);
-    }
+  @Override
+  public String transform(String originalBody, String transactionId) {
+    BodyProcessingContext bodyProcessingContext =
+        new DefaultTransactionIdBodyProcessingContext(transactionId);
+    return bodyProcessorChain.process(originalBody, bodyProcessingContext);
+  }
 }
