@@ -7,7 +7,6 @@ import com.ft.up.apipolicy.pipeline.MutableRequest;
 import com.ft.up.apipolicy.pipeline.MutableResponse;
 import com.ft.up.apipolicy.transformer.BodyProcessingFieldTransformer;
 import com.google.common.base.Strings;
-
 import java.util.Map;
 
 public class SuppressInternalContentFilter implements ApiFilter {
@@ -16,7 +15,8 @@ public class SuppressInternalContentFilter implements ApiFilter {
   private final JsonConverter jsonConverter;
   private BodyProcessingFieldTransformer transformer;
 
-  public SuppressInternalContentFilter(JsonConverter jsonConverter, BodyProcessingFieldTransformer transformer) {
+  public SuppressInternalContentFilter(
+      JsonConverter jsonConverter, BodyProcessingFieldTransformer transformer) {
     this.jsonConverter = jsonConverter;
     this.transformer = transformer;
   }
@@ -25,7 +25,7 @@ public class SuppressInternalContentFilter implements ApiFilter {
   public MutableResponse processRequest(MutableRequest request, HttpPipelineChain chain) {
     MutableResponse response = chain.callNextFilter(request);
 
-    if(!jsonConverter.isJson(response)) {
+    if (!jsonConverter.isJson(response)) {
       return response;
     }
 

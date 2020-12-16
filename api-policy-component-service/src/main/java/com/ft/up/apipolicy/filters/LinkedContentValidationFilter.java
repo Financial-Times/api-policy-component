@@ -13,7 +13,7 @@ public class LinkedContentValidationFilter implements ApiFilter {
     if (request.policyIs(Policy.INCLUDE_RICH_CONTENT)) {
       request.getQueryParameters().putSingle("validateLinkedResources", "true");
     }
-    
+
     return chain.callNextFilter(request);
   }
 }

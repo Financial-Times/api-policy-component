@@ -1,6 +1,5 @@
 package com.ft.up.apipolicy.pipeline;
 
-
 /**
  * HttpPipelineChain
  *
@@ -8,21 +7,21 @@ package com.ft.up.apipolicy.pipeline;
  */
 public class HttpPipelineChain {
 
-    private final HttpPipeline pipeline;
-    private int pointer = 0;
+  private final HttpPipeline pipeline;
+  private int pointer = 0;
 
-    public HttpPipelineChain(final HttpPipeline pipeline) {
-        this.pipeline = pipeline;
+  public HttpPipelineChain(final HttpPipeline pipeline) {
+    this.pipeline = pipeline;
+  }
+
+  public MutableResponse callNextFilter(final MutableRequest request) {
+
+    ApiFilter nextFilter = pipeline.getFilter(pointer++);
+
+    if (nextFilter == null) {
+      return pipeline.forwardRequest(request);
+    } else {
+      return nextFilter.processRequest(request, this);
     }
-
-    public MutableResponse callNextFilter(final MutableRequest request) {
-
-        ApiFilter nextFilter = pipeline.getFilter(pointer++);
-
-        if (nextFilter == null) {
-            return pipeline.forwardRequest(request);
-        } else {
-            return nextFilter.processRequest(request, this);
-        }
-    }
+  }
 }

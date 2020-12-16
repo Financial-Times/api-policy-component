@@ -8,17 +8,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.ft.up.apipolicy.configuration.EndpointConfiguration;
 import com.ft.platform.dropwizard.AdvancedResult;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-
+import com.ft.up.apipolicy.configuration.EndpointConfiguration;
+import java.net.URI;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
-
-import java.net.URI;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * ReaderNodesHealthCheckTest
@@ -27,95 +25,95 @@ import java.net.URI;
  */
 public class ReaderNodesHealthCheckTest {
 
-    // used in stacks with vulcan-based routing
-    private static final String VULCAN_HC_PATH = "/v2/status";
+  // used in stacks with vulcan-based routing
+  private static final String VULCAN_HC_PATH = "/v2/status";
 
-    //used in stacks with varnish-based routing
-    private static final String VARNISH_HC_PATH = "/status";
+  // used in stacks with varnish-based routing
+  private static final String VARNISH_HC_PATH = "/status";
 
-    @Test
-    public void shouldReturnErrorStateIfClientThrowsException() throws Exception {
-        Invocation.Builder builder = mock(Invocation.Builder.class);
-        when(builder.header(any(String.class), any(String.class))).thenReturn(builder);
-        WebTarget target = mock(WebTarget.class);
-        when(target.request()).thenReturn(builder);
-        
-        Client client = mock(Client.class);
-        when(client.target(any(URI.class))).thenReturn(target);
-        
-        when(builder.get()).thenThrow(new RuntimeException("Synthetic client exception"));
-        
-        EndpointConfiguration config = mock(EndpointConfiguration.class);
+  @Test
+  public void shouldReturnErrorStateIfClientThrowsException() throws Exception {
+    Invocation.Builder builder = mock(Invocation.Builder.class);
+    when(builder.header(any(String.class), any(String.class))).thenReturn(builder);
+    WebTarget target = mock(WebTarget.class);
+    when(target.request()).thenReturn(builder);
 
-        ReaderNodesHealthCheck check = new ReaderNodesHealthCheck("test",config,client,false);
+    Client client = mock(Client.class);
+    when(client.target(any(URI.class))).thenReturn(target);
 
-        assertThat(check.checkAdvanced().status(),is(AdvancedResult.Status.ERROR));
-    }
+    when(builder.get()).thenThrow(new RuntimeException("Synthetic client exception"));
 
-    @Test
-    public void shouldReturnErrorStateIfServerGives500() throws Exception {
+    EndpointConfiguration config = mock(EndpointConfiguration.class);
 
-        EndpointConfiguration config = mock(EndpointConfiguration.class);
+    ReaderNodesHealthCheck check = new ReaderNodesHealthCheck("test", config, client, false);
 
-        Client client = primeClientToGive(500);
+    assertThat(check.checkAdvanced().status(), is(AdvancedResult.Status.ERROR));
+  }
 
-        ReaderNodesHealthCheck check = new ReaderNodesHealthCheck("test",config,client,false);
+  @Test
+  public void shouldReturnErrorStateIfServerGives500() throws Exception {
 
-        assertThat(check.checkAdvanced().status(),is(AdvancedResult.Status.ERROR));
-    }
+    EndpointConfiguration config = mock(EndpointConfiguration.class);
 
+    Client client = primeClientToGive(500);
 
-    @Test
-    public void shouldReturnOKStateIfServerGives200() throws Exception {
+    ReaderNodesHealthCheck check = new ReaderNodesHealthCheck("test", config, client, false);
 
-        EndpointConfiguration config = mock(EndpointConfiguration.class);
+    assertThat(check.checkAdvanced().status(), is(AdvancedResult.Status.ERROR));
+  }
 
-        Client client = primeClientToGive(200);
+  @Test
+  public void shouldReturnOKStateIfServerGives200() throws Exception {
 
-        ReaderNodesHealthCheck check = new ReaderNodesHealthCheck("test",config,client,false);
+    EndpointConfiguration config = mock(EndpointConfiguration.class);
 
-        assertThat(check.checkAdvanced().status(),is(AdvancedResult.Status.OK));
-    }
+    Client client = primeClientToGive(200);
 
-    @Test
-    public void shouldCheckVarnishIfCheckVulcanHealthFalse() throws Exception {
-        testHealthcheckURI(false, VARNISH_HC_PATH);
-    }
+    ReaderNodesHealthCheck check = new ReaderNodesHealthCheck("test", config, client, false);
 
-    @Test
-    public void shouldCheckVulcanIfCheckVulcanHealthTrue() throws Exception {
-        testHealthcheckURI(true, VULCAN_HC_PATH);
-    }
+    assertThat(check.checkAdvanced().status(), is(AdvancedResult.Status.OK));
+  }
 
-    private void testHealthcheckURI(boolean checkVulcanHealth, String expectedPath) throws Exception {
-        EndpointConfiguration config = mock(EndpointConfiguration.class);
-        Client client = mock(Client.class);
+  @Test
+  public void shouldCheckVarnishIfCheckVulcanHealthFalse() throws Exception {
+    testHealthcheckURI(false, VARNISH_HC_PATH);
+  }
 
-        ReaderNodesHealthCheck check = new ReaderNodesHealthCheck("test", config, client, checkVulcanHealth);
-        check.checkAdvanced();
+  @Test
+  public void shouldCheckVulcanIfCheckVulcanHealthTrue() throws Exception {
+    testHealthcheckURI(true, VULCAN_HC_PATH);
+  }
 
-        ArgumentCaptor<URI> argument = ArgumentCaptor.forClass(URI.class);
-        verify(client).target(argument.capture());
+  private void testHealthcheckURI(boolean checkVulcanHealth, String expectedPath) throws Exception {
+    EndpointConfiguration config = mock(EndpointConfiguration.class);
+    Client client = mock(Client.class);
 
-        assertNotNull(argument.getValue());
-        String path = argument.getValue().getPath();
-        assertNotNull(path);
-        assertThat(path, is(expectedPath));
-    }
+    ReaderNodesHealthCheck check =
+        new ReaderNodesHealthCheck("test", config, client, checkVulcanHealth);
+    check.checkAdvanced();
 
-    private Client primeClientToGive(int status) {
-        Invocation.Builder builder = mock(Invocation.Builder.class);
-        when(builder.header(any(String.class), any(String.class))).thenReturn(builder);
-        WebTarget target = mock(WebTarget.class);
-        when(target.request()).thenReturn(builder);
-        
-        Client client = mock(Client.class);
-        when(client.target(any(URI.class))).thenReturn(target);
-        
-        Response mockResponse = mock(Response.class);
-        when(mockResponse.getStatus()).thenReturn(status);
-        when(builder.get()).thenReturn(mockResponse);
-        
-        return client;
-    }
+    ArgumentCaptor<URI> argument = ArgumentCaptor.forClass(URI.class);
+    verify(client).target(argument.capture());
+
+    assertNotNull(argument.getValue());
+    String path = argument.getValue().getPath();
+    assertNotNull(path);
+    assertThat(path, is(expectedPath));
+  }
+
+  private Client primeClientToGive(int status) {
+    Invocation.Builder builder = mock(Invocation.Builder.class);
+    when(builder.header(any(String.class), any(String.class))).thenReturn(builder);
+    WebTarget target = mock(WebTarget.class);
+    when(target.request()).thenReturn(builder);
+
+    Client client = mock(Client.class);
+    when(client.target(any(URI.class))).thenReturn(target);
+
+    Response mockResponse = mock(Response.class);
+    when(mockResponse.getStatus()).thenReturn(status);
+    when(builder.get()).thenReturn(mockResponse);
+
+    return client;
+  }
 }

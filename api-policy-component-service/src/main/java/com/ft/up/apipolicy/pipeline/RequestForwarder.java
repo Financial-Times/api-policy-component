@@ -6,5 +6,5 @@ package com.ft.up.apipolicy.pipeline;
  * @author Simon.Gibbs
  */
 public interface RequestForwarder {
-    MutableResponse forwardRequest(MutableRequest request);
+  MutableResponse forwardRequest(MutableRequest request);
 }
