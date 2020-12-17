@@ -1,12 +1,6 @@
 # UPP - API-Policy-Component
 
-An HTTP service that provides a facade over the reader endpoint for use by licensed partners.
-
-* adds calculated fields for use by B2B partners
-* blocks or hides content that is not permitted to the partner
-* rewrites queries according to account configuration
-
-This component is generally deployed with a proxy (Varnish) between it and the actual reader endpoints. 
+An HTTP service that provides a facade over the reader endpoint for use by licensed partners. It adds calculated fields for use by B2B partners, blocks or hides content that is not permitted to the partner and rewrites queries according to account configuration. This component is generally deployed with a proxy (Varnish) between it and the actual reader endpoints. 
 
 ## Code
 
