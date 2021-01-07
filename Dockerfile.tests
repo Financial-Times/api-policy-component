@@ -1,0 +1,12 @@
+FROM openjdk:8u212-jdk-alpine3.9
+
+RUN apk update && apk upgrade
+ENV MAVEN_HOME=/root/.m2
+RUN apk add maven curl
+
+RUN mkdir $MAVEN_HOME \
+    && curl -v -o /root/.m2/settings.xml "https://raw.githubusercontent.com/Financial-Times/nexus-settings/master/public-settings.xml"
+
+
+COPY . /api-policy-component/
+WORKDIR /api-policy-component
