@@ -55,15 +55,12 @@ public class NotificationsTypeFilter implements ApiFilter {
 
   private void addQueryParams(MutableRequest request) {
     List<String> typeParams = new ArrayList<>();
-    boolean hasRequiredPolicy = request.policyIs(policy);
-    if (hasRequiredPolicy) {
+    if (request.policyIs(policy)) {
       typeParams.add("all");
     } else {
       typeParams.add("article");
     }
-
     request.getQueryParameters().put(TYPE_KEY, typeParams);
-    request.getQueryParameters().putSingle("monitor", String.valueOf(hasRequiredPolicy));
   }
 
   private void stripTypeParam(Map<String, Object> content, String key) {

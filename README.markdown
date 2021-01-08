@@ -43,7 +43,7 @@ Note that one policy might be used by many filters and filters might work with m
 | unrolledContentFilter                 | Adds `unrollContent=true` to the request query if the INCLUDE_RICH_CONTENT and EXPAND_RICH_CONTENT policies are present                                                                                             | /content-preview, /internalcontent-preview, /enrichedcontent, /internalcontent                   |
 | stripCommentsFields                   | Removes the `comments` field from the response unless the INCLUDE_COMMENTS policy is present                                                                                                                       | /content-preview, /internalcontent-preview, /enrichedcontent, /internalcontent                   |
 | brandFilter                           | Adds `forBrand=XXX` to the request query if FASTFT_CONTENT_ONLY policy is present or adds `notForBrand=XXX` to the request query if EXCLUDE_FASTFT_CONTENT policy is present, where XXX is the brand id for FastFT | /content/notifications                                                                           |
-| mediaResourceNotificationsFilter      | Adds `type=all` and `monitor=true` to the request query if the INTERNAL_UNSTABLE policy is present, otherwise adds `type=article` and `monitor=false`                                                                                                    | /content/notifications                                                                           |
+| mediaResourceNotificationsFilter      | Adds `type=all` to the request query if the INTERNAL_UNSTABLE policy is present, otherwise adds `type=article`                                                                                                     | /content/notifications                                                                           |
 | accessLevelPropertyFilter             | Removes the `accessLevel` field from the response unless the INTERNAL_UNSTABLE policy is present                                                                                                                   | /enrichedcontent, /internalcontent                                                               |
 | accessLevelHeaderFilter               | Removes the `X-FT-Access-Level` header from the response unless the INTERNAL_UNSTABLE policy is present                                                                                                            | /enrichedcontent, /internalcontent                                                               |
 | contentPackageFilter                  | Removes the `contains` and `containedIn` fields from the response unless the INTERNAL_UNSTABLE policy is present                                                                                                   | /enrichedcontent, /internalcontent                                                               |
@@ -110,18 +110,3 @@ Building with docker:
 Running as a docker container:
 
 ```docker run --rm -p 8080 -p 8081 --env "JAVA_OPTS=-Xms384m -Xmx384m -XX:+UseG1GC -server" --env "READ_ENDPOINT=localhost:8080:8080" --env "JERSEY_TIMEOUT_DURATION=10000ms" coco/api-policy-component:your-version```
-
-## Running all tests using Docker Compose
-- Set the following environment variables (get the values from LastPass) so that Maven will be able to fetch all needed dependencies:
-    ```
-    export SONATYPE_USER="xxx"
-    export SONATYPE_PASSWORD="xxx"
-    ```
-- Run the standard triplet of Docker/Compose commands:
-    ```
-    docker-compose -f docker-compose-tests.yml up -d --build && \
-    docker logs -f test-runner && \
-    docker-compose -f docker-compose-tests.yml down -v
-    ```
-
-**Note**: The `docker-compose-tests.yml` file is set to mount the standard directory used for the local Maven repository (`~/.m2/repository`) into the `test-runner` container, but if you have not used Maven before you can set it to any other directory on your system.
