@@ -17,6 +17,7 @@ public class NotificationsTypeFilter implements ApiFilter {
   private static final String LINKS_KEY = "links";
   private static final String HREF_KEY = "href";
   private static final String TYPE_KEY = "type";
+  private static final String MONITOR_KEY = "monitor";
 
   private JsonConverter converter;
   private Policy policy;
@@ -63,7 +64,11 @@ public class NotificationsTypeFilter implements ApiFilter {
     }
 
     request.getQueryParameters().put(TYPE_KEY, typeParams);
-    request.getQueryParameters().putSingle("monitor", String.valueOf(hasRequiredPolicy));
+
+    List<String> monitorParams = new ArrayList<>();
+    monitorParams.add(String.valueOf(hasRequiredPolicy));
+
+    request.getQueryParameters().put(MONITOR_KEY, monitorParams);
   }
 
   private void stripTypeParam(Map<String, Object> content, String key) {
