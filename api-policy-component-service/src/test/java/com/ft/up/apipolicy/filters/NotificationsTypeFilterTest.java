@@ -33,9 +33,9 @@ public class NotificationsTypeFilterTest {
   public static final String ERROR_RESPONSE = "{ \"message\" : \"Error\" }";
   public static final String SUCCESS_RESPONSE =
       "{ \"requestUrl\":"
-          + " \"http://example.org/content/notifications?since=2016-07-23T00:00:00.000Z&type=article&type=mediaResource\","
+          + " \"http://example.org/content/notifications?since=2016-07-23T00:00:00.000Z&type=article&type=mediaResource&monitor=false\","
           + " \"links\": [ {\"href\":"
-          + " \"http://example.org/content/100?since=2016-07-23T00:00:00.000Z&type=article&type=mediaResource\","
+          + " \"http://example.org/content/100?since=2016-07-23T00:00:00.000Z&type=article&type=mediaResource&monitor=false\","
           + " \"rel\" : \"next\"}] }";
   public static final String STRIPPED_SUCCESS_RESPONSE =
       "{\"requestUrl\":\"http://example.org/content/notifications?since=2016-07-23T00:00:00.000Z\",\"links\":[{\"href\":\"http://example.org/content/100?since=2016-07-23T00:00:00.000Z\",\"rel\":\"next\"}]}";
@@ -178,7 +178,7 @@ public class NotificationsTypeFilterTest {
 
     String responseBody =
         "{ \"requestUrl\":"
-            + " \"http://example.org/content/notifications?since=2016-07-23T00:00:00.000Z&type=article&type=mediaResource\","
+            + " \"http://example.org/content/notifications?since=2016-07-23T00:00:00.000Z&type=article&type=mediaResource&monitor=false\","
             + " \"links\": [] }";
     String strippedBody =
         "{\"requestUrl\":\"http://example.org/content/notifications?since=2016-07-23T00:00:00.000Z\",\"links\":[]}";
