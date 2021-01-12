@@ -17,6 +17,7 @@ public class NotificationsTypeFilter implements ApiFilter {
   private static final String LINKS_KEY = "links";
   private static final String HREF_KEY = "href";
   private static final String TYPE_KEY = "type";
+  private static final String MONITOR_KEY = "monitor";
 
   private JsonConverter converter;
   private Policy policy;
@@ -35,19 +36,23 @@ public class NotificationsTypeFilter implements ApiFilter {
     if (response.getStatus() != 200) {
       return response;
     }
+
     Map<String, Object> content = converter.readEntity(response);
     if (!typeCheckSucceeds(content)) {
       throw new FilterException(
           new IllegalStateException("Notifications json response is not in expected format."));
     }
 
-    stripTypeParam(content, REQUEST_URL_KEY);
+    stripInternalParams(content, REQUEST_URL_KEY);
+
     List links = (List) content.get(LINKS_KEY);
     if (links.isEmpty()) {
       converter.replaceEntity(response, content);
       return response;
     }
-    stripTypeParam((Map) links.get(0), HREF_KEY);
+
+    stripInternalParams((Map) links.get(0), HREF_KEY);
+
     converter.replaceEntity(response, content);
 
     return response;
@@ -63,12 +68,17 @@ public class NotificationsTypeFilter implements ApiFilter {
     }
 
     request.getQueryParameters().put(TYPE_KEY, typeParams);
-    request.getQueryParameters().putSingle("monitor", String.valueOf(hasRequiredPolicy));
+
+    List<String> monitorParams = new ArrayList<>();
+    monitorParams.add(String.valueOf(hasRequiredPolicy));
+
+    request.getQueryParameters().put(MONITOR_KEY, monitorParams);
   }
 
-  private void stripTypeParam(Map<String, Object> content, String key) {
+  private void stripInternalParams(Map<String, Object> content, String key) {
     UriBuilder uriBuilder = UriBuilder.fromUri((String) content.get(key));
     uriBuilder.replaceQueryParam(TYPE_KEY, null);
+    uriBuilder.replaceQueryParam(MONITOR_KEY, null);
     content.put(key, uriBuilder.build());
   }
 

@@ -3,7 +3,6 @@ package com.ft.up.apipolicy.filters;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -34,9 +33,9 @@ public class NotificationsTypeFilterTest {
   public static final String ERROR_RESPONSE = "{ \"message\" : \"Error\" }";
   public static final String SUCCESS_RESPONSE =
       "{ \"requestUrl\":"
-          + " \"http://example.org/content/notifications?since=2016-07-23T00:00:00.000Z&type=article&type=mediaResource\","
+          + " \"http://example.org/content/notifications?since=2016-07-23T00:00:00.000Z&type=article&type=mediaResource&monitor=false\","
           + " \"links\": [ {\"href\":"
-          + " \"http://example.org/content/100?since=2016-07-23T00:00:00.000Z&type=article&type=mediaResource\","
+          + " \"http://example.org/content/100?since=2016-07-23T00:00:00.000Z&type=article&type=mediaResource&monitor=false\","
           + " \"rel\" : \"next\"}] }";
   public static final String STRIPPED_SUCCESS_RESPONSE =
       "{\"requestUrl\":\"http://example.org/content/notifications?since=2016-07-23T00:00:00.000Z\",\"links\":[{\"href\":\"http://example.org/content/100?since=2016-07-23T00:00:00.000Z\",\"rel\":\"next\"}]}";
@@ -116,7 +115,7 @@ public class NotificationsTypeFilterTest {
 
     filter.processRequest(request, chain);
 
-    verify(params).putSingle("monitor", "true");
+    verify(params).put("monitor", Collections.singletonList("true"));
   }
 
   @Test
@@ -128,7 +127,7 @@ public class NotificationsTypeFilterTest {
 
     filter.processRequest(request, chain);
 
-    verify(params).putSingle("monitor", "false");
+    verify(params).put("monitor", Collections.singletonList("false"));
   }
 
   @Test
@@ -141,7 +140,7 @@ public class NotificationsTypeFilterTest {
 
     filter.processRequest(request, chain);
 
-    assertEquals("false", params.getFirst("monitor"));
+    assertThat(params.get("monitor"), equalTo(Collections.singletonList("false")));
   }
 
   @Test
@@ -179,7 +178,7 @@ public class NotificationsTypeFilterTest {
 
     String responseBody =
         "{ \"requestUrl\":"
-            + " \"http://example.org/content/notifications?since=2016-07-23T00:00:00.000Z&type=article&type=mediaResource\","
+            + " \"http://example.org/content/notifications?since=2016-07-23T00:00:00.000Z&type=article&type=mediaResource&monitor=false\","
             + " \"links\": [] }";
     String strippedBody =
         "{\"requestUrl\":\"http://example.org/content/notifications?since=2016-07-23T00:00:00.000Z\",\"links\":[]}";
