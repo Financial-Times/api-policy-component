@@ -18,24 +18,6 @@ Platinum
 
 Production
 
-## Delivered By
-
-content
-
-## Supported By
-
-content
-
-## Known About By
-
-- elitsa.pavlova
-- hristo.georgiev
-- dimitar.terziev
-- georgi.ivanov
-- tsvetan.dimitrov
-- robert.marinov
-- elina.kaneva
-
 ## Host Platform
 
 AWS
