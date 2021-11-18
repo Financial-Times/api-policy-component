@@ -138,6 +138,13 @@ public class ApiPolicyApplication extends Application<ApiPolicyConfiguration> {
         createEndpoint(
             environment,
             configuration,
+            "^/pages/notifications.*",
+            "page-notifications",
+            apiFilters.notificationsFilter()));
+    knownWildcardEndpoints.add(
+        createEndpoint(
+            environment,
+            configuration,
             "^/content/notifications.*",
             "notifications",
             apiFilters.contentNotificationsFilters()));
