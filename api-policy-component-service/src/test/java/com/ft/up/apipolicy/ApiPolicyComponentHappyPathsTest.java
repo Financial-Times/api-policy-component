@@ -123,6 +123,8 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
   private static final String LIST_UUID = "9125b25e-8305-11e5-8317-6f9588949b85";
   private static final String LISTS_BASE_PATH = "/lists";
   private static final String LISTS_PATH = LISTS_BASE_PATH + "/" + LIST_UUID;
+  private static final String PAGE_UUID = "9125b25e-8305-11e5-8317-6f9588949b86";
+  private static final String PAGES_BASE_PATH = "/pages";
   private static final String PARAM_VALIDATE_LINKS = "validateLinkedResources";
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -286,6 +288,15 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
           + "\"publishReference\": \"tid_vcxz08642\" "
           + "}";
 
+  private static final String PAGE_NOTIFICATION_JSON =
+      "{"
+          + "\"id\": \"http://api.ft.com/things/9125b25e-8305-11e5-8317-6f9588949b86\", "
+          + "\"title\": \"Technology - Page\", "
+          + "\"apiUrl\": \"http://test.api.ft.com/pages/a2f9e77a-62cb-11e5-9846-de406ccb37f2\", "
+          + "\"lastModified\": \"2021-11-13T17:04:54.636Z\",\n"
+          + "\"publishReference\": \"tid_pg_vcxz08642\" "
+          + "}";
+
   private static final String NOTIFICATIONS_RESPONSE_TEMPLATE =
       "{"
           + "\"requestUrl\": \"http://contentapi2.ft.com/content/notifications?since="
@@ -379,6 +390,9 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
 
   private static final String LIST_NOTIFICATIONS_JSON =
       String.format(NOTIFICATIONS_RESPONSE_TEMPLATE, "", LIST_NOTIFICATION_JSON);
+
+  private static final String PAGE_NOTIFICATIONS_JSON =
+      String.format(NOTIFICATIONS_RESPONSE_TEMPLATE, "", PAGE_NOTIFICATION_JSON);
 
   @Rule public final WireMockClassRule wireMockForVarnish = WIRE_MOCK_1;
 
@@ -1180,6 +1194,31 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
     final Response response = client.target(uri).request().get();
     try {
       verify(getRequestedFor(urlPathMatching(LISTS_BASE_PATH + "/notifications")));
+      String entity = response.readEntity(String.class);
+
+      assertThat(response.getStatus(), is(200));
+      assertThat(entity, not(containsJsonProperty("lastModified")));
+      assertThat(entity, not(containsJsonProperty("publishReference")));
+    } finally {
+      response.close();
+    }
+  }
+
+  @Test
+  public void shouldForwardPageNotificationsCall() throws Exception {
+    givenEverythingSetup();
+
+    final URI uri = fromFacade(PAGES_BASE_PATH + "/notifications").build();
+    stubFor(
+        get(urlPathEqualTo(PAGES_BASE_PATH + "/notifications"))
+            .willReturn(
+                aResponse()
+                    .withBody(PAGE_NOTIFICATIONS_JSON)
+                    .withHeader("Content-Type", MediaType.APPLICATION_JSON)
+                    .withStatus(200)));
+    final Response response = client.target(uri).request().get();
+    try {
+      verify(getRequestedFor(urlPathMatching(PAGES_BASE_PATH + "/notifications")));
       String entity = response.readEntity(String.class);
 
       assertThat(response.getStatus(), is(200));
