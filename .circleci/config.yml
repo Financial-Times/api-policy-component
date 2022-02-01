@@ -10,10 +10,24 @@ workflows:
 jobs:
   build:
     docker:
-      - image:  docker:stable-git
+      - image: cimg/openjdk:8.0
     steps:
       - checkout
       - setup_remote_docker
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "pom.xml" }}
+            - v1-dependencies-
+      - run:
+          name: Build package, run tests and upload test coverage
+          command: |
+            mkdir -p ~/.m2/
+            curl -v -o ~/.m2/settings.xml "https://raw.githubusercontent.com/Financial-Times/nexus-settings/master/public-settings.xml"
+            mvn clean package jacoco:report-aggregate coveralls:report -Djava.net.preferIPv4Stack=true -DrepoToken=${COVERALLS_TOKEN}
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "pom.xml" }}
       - run:
           name: Set Docker image tag based on branch or git tag
           command: |
@@ -33,10 +47,3 @@ jobs:
             --build-arg SONATYPE_PASSWORD=${SONATYPE_PASSWORD} \
             --build-arg GIT_TAG=${DOCKER_TAG} \
             --tag nexus.in.ft.com:5000/coco/${CIRCLE_PROJECT_REPONAME}:${DOCKER_TAG} .
-      - deploy:
-          name: Push Docker image
-          command: |
-            source ${BASH_ENV}
-            docker login nexus.in.ft.com:5000 -u ${DOCKER_USER} -p ${DOCKER_PASSWORD}
-            docker push nexus.in.ft.com:5000/coco/${CIRCLE_PROJECT_REPONAME}:${DOCKER_TAG}
-            

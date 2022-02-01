@@ -10,4 +10,4 @@ services:
       SONATYPE_PASSWORD: ${SONATYPE_PASSWORD}
     volumes:
       - ~/.m2/repository:/root/.m2/repository
-    command: ["mvn", "test"]
+    command: ["mvn", "test", "clean", "package", "jacoco:report", "coveralls:report"]

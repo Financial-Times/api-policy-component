@@ -11,7 +11,6 @@
   <url>http://www.ft.com</url>
   <inceptionYear>2014</inceptionYear>
   <properties>
-    <surefire.reportplugin.version>2.22.2</surefire.reportplugin.version>
     <maven-jar-plugin.version>2.3.2</maven-jar-plugin.version>
     <maven-source-plugin.version>2.2.1</maven-source-plugin.version>
     <maven-shade-plugin.version>.</maven-shade-plugin.version>
@@ -25,8 +24,8 @@
     <maven-jxr-plugin.version>2.3</maven-jxr-plugin.version>
     <target-jdk>1.8</target-jdk>
     <mockito-core.version>1.9.5</mockito-core.version>
-    <jacoco-maven-plugin.version>0.7.4.201502262128</jacoco-maven-plugin.version>
     <maven-resources-plugin.version>2.6</maven-resources-plugin.version>
+    <jacoco-maven-plugin.version>0.7.7.201606060606</jacoco-maven-plugin.version>
   </properties>
   <dependencies>
     <dependency>
@@ -195,25 +194,25 @@
       </resource>
     </resources>
     <plugins>
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <version>${jacoco-maven-plugin.version}</version>
-        <executions>
-          <execution>
-            <id>prepare-agent</id>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>report</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>report</goal>
-            </goals>
-          </execution>
-        </executions>
+       <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>${jacoco-maven-plugin.version}</version>
+            <executions>
+                <execution>
+                    <id>prepare-agent</id>
+                    <goals>
+                        <goal>prepare-agent</goal>
+                    </goals>
+                </execution>
+                <execution>
+                    <id>report</id>
+                    <phase>prepare-package</phase>
+                    <goals>
+                        <goal>report</goal>
+                    </goals>
+                </execution>
+            </executions>
       </plugin>
       <plugin>
         <artifactId>maven-pmd-plugin</artifactId>
@@ -368,13 +367,6 @@
       <plugin>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <version>${checkstyle.version}</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>${surefire.reportplugin.version}</version>
-        <configuration>
-          <useSystemClassLoader>false</useSystemClassLoader>
-        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-pmd-plugin</artifactId>

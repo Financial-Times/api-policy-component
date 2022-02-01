@@ -1,6 +1,7 @@
 Api Policy Component
 ====================
 [![CircleCI](https://circleci.com/gh/Financial-Times/api-policy-component.svg?style=shield)](https://circleci.com/gh/Financial-Times/api-policy-component)
+[![Coverage Status](https://coveralls.io/repos/github/Financial-Times/api-policy-component/badge.svg?branch=master)](https://coveralls.io/github/Financial-Times/api-policy-component?branch=master)
 
 An HTTP service provides a facade over the reader endpoint for use by licenced partners.
 
