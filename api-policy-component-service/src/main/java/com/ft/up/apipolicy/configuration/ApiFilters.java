@@ -133,6 +133,10 @@ public class ApiFilters {
   }
 
   public ApiFilter notificationsFilter() {
+    return new PolicyBasedJsonFilter(notificationsFiltersMap());
+  }
+
+  private Map<String, Policy> notificationsFiltersMap() {
     Map<String, Policy> notificationsJsonFilters = new HashMap<>();
     // whitelisted (no policy required)
     notificationsJsonFilters.put("$.requestUrl", null);
@@ -145,7 +149,7 @@ public class ApiFilters {
     notificationsJsonFilters.put("$.notifications[*].notificationDate", INCLUDE_LAST_MODIFIED_DATE);
     notificationsJsonFilters.put("$.notifications[*].publishReference", INCLUDE_PROVENANCE);
 
-    return new PolicyBasedJsonFilter(notificationsJsonFilters);
+    return notificationsJsonFilters;
   }
 
   public ApiFilter[] listsFilters() {
@@ -228,7 +232,12 @@ public class ApiFilters {
   }
 
   public ApiFilter[] contentNotificationsFilters() {
-    return new ApiFilter[] {mediaResourceNotificationsFilter, brandFilter, notificationsFilter()};
+    Map<String, Policy> notificationsFilters = notificationsFiltersMap();
+    notificationsFilters.put("$.notifications[*].contentType", INTERNAL_UNSTABLE);
+
+    return new ApiFilter[] {
+      mediaResourceNotificationsFilter, brandFilter, new PolicyBasedJsonFilter(notificationsFilters)
+    };
   }
 
   public ApiFilter[] contentIdentifiersFilters() {
