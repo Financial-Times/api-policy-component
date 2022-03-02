@@ -22,6 +22,7 @@ public class ApiFilters {
   private static final String COMMENTS_JSON_PROPERTY = "comments";
   private static final String PROVENANCE_JSON_PROPERTY = "publishReference";
   private static final String LAST_MODIFIED_JSON_PROPERTY = "lastModified";
+  private static final String LITE_JSON_PROPERTY = "lite";
   private static final String OPENING_XML_JSON_PROPERTY = "openingXML";
   private static final String ACCESS_LEVEL_JSON_PROPERTY = "accessLevel";
   private static final String CONTENT_PACKAGE_CONTAINS_JSON_PROPERTY = "contains";
@@ -45,6 +46,7 @@ public class ApiFilters {
   private ApiFilter addSyndication;
   private ApiFilter brandFilter;
   private ApiFilter stripLastModifiedDate;
+  private ApiFilter stripLite;
   private ApiFilter stripOpeningXml;
   private ApiFilter linkValidationFilter;
   private ApiFilter mediaResourceNotificationsFilter;
@@ -93,6 +95,9 @@ public class ApiFilters {
     stripLastModifiedDate =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
             jsonTweaker, INCLUDE_LAST_MODIFIED_DATE, LAST_MODIFIED_JSON_PROPERTY);
+    stripLite =
+        new RemoveJsonPropertiesUnlessPolicyPresentFilter(
+            jsonTweaker, INCLUDE_LITE, LITE_JSON_PROPERTY);
     stripOpeningXml =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
             jsonTweaker, INTERNAL_UNSTABLE, OPENING_XML_JSON_PROPERTY);
@@ -172,6 +177,7 @@ public class ApiFilters {
       stripCommentsFields,
       stripProvenance,
       stripLastModifiedDate,
+      stripLite,
       stripOpeningXml,
       accessLevelPropertyFilter,
       accessLevelHeaderFilter,

@@ -98,7 +98,14 @@ public class ApiPolicyComponentContentEndpointsRestrictedPropertiesTest
   private static final String ENRICHED_CONTENT_JSON =
       "{" + ARTICLE_JSON + ",\n" + "\"brands\": [ ],\n" + "\"annotations\": [ ]" + "}";
 
-  private static final String INTERNAL_CONTENT_JSON = ENRICHED_CONTENT_JSON;
+  private static final String INTERNAL_CONTENT_JSON =
+      "{"
+          + ARTICLE_JSON
+          + ",\n"
+          + "\"brands\": [ ],\n"
+          + "\"annotations\": [ ],\n"
+          + "\"lite\": { }"
+          + "}";
 
   private static final String IMAGE_JSON =
       "{"
@@ -132,6 +139,17 @@ public class ApiPolicyComponentContentEndpointsRestrictedPropertiesTest
      */
     return Arrays.asList(
         new Object[][] {
+          {
+            "lite",
+            Policy.INCLUDE_LITE,
+            false,
+            false,
+            false,
+            true,
+            CONTENT_JSON,
+            ENRICHED_CONTENT_JSON,
+            INTERNAL_CONTENT_JSON
+          },
           {
             "comments",
             Policy.INCLUDE_COMMENTS,
