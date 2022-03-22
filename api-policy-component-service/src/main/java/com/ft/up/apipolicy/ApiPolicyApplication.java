@@ -94,6 +94,8 @@ public class ApiPolicyApplication extends Application<ApiPolicyConfiguration> {
     knownWhitelistedPostEndpoints.add(
         createEndpoint(
             environment, configuration, "^/content/advanced-search", "combined-content-search"));
+    knownWhitelistedPostEndpoints.add(
+        createEndpoint(environment, configuration, "^/enrichedcontent/v2", "hasura"));
 
     return knownWhitelistedPostEndpoints;
   }
