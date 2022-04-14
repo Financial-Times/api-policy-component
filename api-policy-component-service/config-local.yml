@@ -62,7 +62,7 @@ logging:
       logFormat: "%m%n"
 
 appInfo:
-    systemCode: "APIPolicyComponent"
+    systemCode: "api-policy-component"
     description: "ApiPolicyApplication"
 
 canonicalWebUrlTemplate: "https://www.ft.com/content/%s"
