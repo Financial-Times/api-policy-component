@@ -81,6 +81,6 @@ public class ReaderNodesHealthCheck extends AdvancedHealthCheck {
 
   @Override
   protected String panicGuideUrl() {
-    return "https://runbooks.in.ft.com/api-policy-component";
+    return "https://runbooks.ftops.tech/api-policy-component";
   }
 }
