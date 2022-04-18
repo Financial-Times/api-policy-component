@@ -48,7 +48,7 @@ public class FluentLoggingBuilder {
   public static final String MESSAGE = "msg";
   public static final String PROTOCOL = "protocol";
   public static final String APPLICATION_NAME = "api-policy-component";
-  public static final String RUNBOOK_URI = "https://runbooks.in.ft.com/api-policy-component";
+  public static final String RUNBOOK_URI = "https://runbooks.ftops.tech/api-policy-component";
 
   private Map<String, Object> items;
   private String methodName;
