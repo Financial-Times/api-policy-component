@@ -34,7 +34,7 @@ RUN apk --update add git maven curl \
   && rm -rf /var/cache/apk/* \
   && rm -rf $MAVEN_HOME/*
 
-FROM openjdk:8u212-jdk-alpine3.9
+FROM openjdk:8u332-jre-slim
 COPY --from=0 /api-policy-component-service.jar /api-policy-component-service.jar
 COPY --from=0 /config.yml /config.yml
 
