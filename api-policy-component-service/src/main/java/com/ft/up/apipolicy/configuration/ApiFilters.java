@@ -148,6 +148,7 @@ public class ApiFilters {
     notificationsJsonFilters.put("$.links[*].*", null);
     notificationsJsonFilters.put("$.notifications[*].id", null);
     notificationsJsonFilters.put("$.notifications[*].type", null);
+    notificationsJsonFilters.put("$.notifications[*].subType", null);
     notificationsJsonFilters.put("$.notifications[*].apiUrl", null);
     // restricted (policy required)
     notificationsJsonFilters.put("$.notifications[*].lastModified", INCLUDE_LAST_MODIFIED_DATE);
