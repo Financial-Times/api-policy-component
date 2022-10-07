@@ -1,4 +1,4 @@
-FROM openjdk:8u212-jdk-alpine3.9
+FROM eclipse-temurin:8u345-b01-jdk-alpine
 
 ADD .git/ /.git/
 ADD api-policy-component-service/ /api-policy-component-service/
@@ -34,7 +34,7 @@ RUN apk --update add git maven curl \
   && rm -rf /var/cache/apk/* \
   && rm -rf $MAVEN_HOME/*
 
-FROM openjdk:8u332-jre-slim
+FROM eclipse-temurin:8u345-b01-jre
 COPY --from=0 /api-policy-component-service.jar /api-policy-component-service.jar
 COPY --from=0 /config.yml /config.yml
 
