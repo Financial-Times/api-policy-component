@@ -23,6 +23,7 @@ public class ApiFilters {
   private static final String PROVENANCE_JSON_PROPERTY = "publishReference";
   private static final String LAST_MODIFIED_JSON_PROPERTY = "lastModified";
   private static final String LITE_JSON_PROPERTY = "lite";
+  private static final String BODY_TREE_JSON_PROPERTY = "bodyTree";
   private static final String OPENING_XML_JSON_PROPERTY = "openingXML";
   private static final String ACCESS_LEVEL_JSON_PROPERTY = "accessLevel";
   private static final String CONTENT_PACKAGE_CONTAINS_JSON_PROPERTY = "contains";
@@ -47,6 +48,7 @@ public class ApiFilters {
   private ApiFilter brandFilter;
   private ApiFilter stripLastModifiedDate;
   private ApiFilter stripLite;
+  private ApiFilter stripBodyTree;
   private ApiFilter stripOpeningXml;
   private ApiFilter linkValidationFilter;
   private ApiFilter mediaResourceNotificationsFilter;
@@ -98,6 +100,9 @@ public class ApiFilters {
     stripLite =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
             jsonTweaker, INCLUDE_LITE, LITE_JSON_PROPERTY);
+    stripBodyTree =
+        new RemoveJsonPropertiesUnlessPolicyPresentFilter(
+            jsonTweaker, INCLUDE_BODY_TREE, BODY_TREE_JSON_PROPERTY);
     stripOpeningXml =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
             jsonTweaker, INTERNAL_UNSTABLE, OPENING_XML_JSON_PROPERTY);
@@ -179,6 +184,7 @@ public class ApiFilters {
       stripProvenance,
       stripLastModifiedDate,
       stripLite,
+      stripBodyTree,
       stripOpeningXml,
       accessLevelPropertyFilter,
       accessLevelHeaderFilter,
@@ -228,6 +234,7 @@ public class ApiFilters {
       stripCommentsFields,
       stripProvenance,
       stripLastModifiedDate,
+      stripBodyTree,
       stripOpeningXml,
       accessLevelPropertyFilter,
       accessLevelHeaderFilter,
@@ -264,6 +271,7 @@ public class ApiFilters {
       removeCommentsFieldRegardlessOfPolicy,
       stripProvenance,
       stripLastModifiedDate,
+      stripBodyTree,
       stripOpeningXml,
       removeAccessFieldRegardlessOfPolicy,
       editorialDeskFilter,
