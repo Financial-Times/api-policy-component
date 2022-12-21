@@ -104,6 +104,7 @@ public class ApiPolicyComponentContentEndpointsRestrictedPropertiesTest
           + ",\n"
           + "\"brands\": [ ],\n"
           + "\"annotations\": [ ],\n"
+          + "\"summary\": { \"bodyTree\": {  } },"
           + "\"lite\": { }"
           + "}";
 
