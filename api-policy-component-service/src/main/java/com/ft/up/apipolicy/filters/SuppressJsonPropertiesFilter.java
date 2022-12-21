@@ -78,7 +78,7 @@ public class SuppressJsonPropertiesFilter extends AbstractImageFilter {
     FieldModifier modifier =
         (jsonProp, contentModel) -> {
           if (shouldPropertyFilteredOut(jsonProp, request, contentModel)) {
-            contentModel.remove(jsonProp);
+            removeProperty(contentModel, jsonProp);
             jsonConverter.replaceEntity(response, content);
           }
         };
@@ -89,5 +89,9 @@ public class SuppressJsonPropertiesFilter extends AbstractImageFilter {
   protected boolean shouldPropertyFilteredOut(
       final String jsonProperty, MutableRequest request, final Map content) {
     return content.containsKey(jsonProperty);
+  }
+
+  protected void removeProperty(Map contentModel, String jsonProp) {
+    contentModel.remove(jsonProp);
   }
 }
