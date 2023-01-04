@@ -138,10 +138,10 @@ public class ApiFilters {
   }
 
   public ApiFilter notificationsFilter() {
-    return new PolicyBasedJsonFilter(getNotificationsFilters());
+    return new PolicyBasedJsonFilter(getNotificationsFilters(null));
   }
 
-  private Map<String, Policy> getNotificationsFilters() {
+  private Map<String, Policy> getNotificationsFilters(Policy contentTypePolicy) {
     Map<String, Policy> notificationsJsonFilters = new HashMap<>();
     // whitelisted (no policy required)
     notificationsJsonFilters.put("$.requestUrl", null);
@@ -155,14 +155,11 @@ public class ApiFilters {
     notificationsJsonFilters.put("$.notifications[*].notificationDate", INCLUDE_LAST_MODIFIED_DATE);
     notificationsJsonFilters.put("$.notifications[*].publishReference", INCLUDE_PROVENANCE);
 
+    if (contentTypePolicy != null) {
+      notificationsJsonFilters.put("$.notifications[*].contentType", contentTypePolicy);
+    }
+
     return notificationsJsonFilters;
-  }
-
-  private Map<String, Policy> getNotificationTypeFilter(Policy policy) {
-    Map<String, Policy> typeFilters = new HashMap<>();
-    typeFilters.put("$.notifications[*].contentType", policy);
-
-    return typeFilters;
   }
 
   public ApiFilter[] listsFilters() {
@@ -249,8 +246,7 @@ public class ApiFilters {
     return new ApiFilter[] {
       mediaResourceNotificationsFilter,
       brandFilter,
-      new PolicyBasedJsonFilter(getNotificationsFilters()),
-      new PolicyBasedJsonFilter(getNotificationTypeFilter(INTERNAL_UNSTABLE))
+      new PolicyBasedJsonFilter(getNotificationsFilters(INTERNAL_UNSTABLE))
     };
   }
 
