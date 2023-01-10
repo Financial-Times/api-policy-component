@@ -1,7 +1,9 @@
 package com.ft.up.apipolicy.filters;
 
+import static com.ft.up.apipolicy.configuration.Policy.EXTENDED_PULL_NOTIFICATIONS;
+import static com.ft.up.apipolicy.configuration.Policy.INTERNAL_UNSTABLE;
+
 import com.ft.up.apipolicy.JsonConverter;
-import com.ft.up.apipolicy.configuration.Policy;
 import com.ft.up.apipolicy.pipeline.ApiFilter;
 import com.ft.up.apipolicy.pipeline.HttpPipelineChain;
 import com.ft.up.apipolicy.pipeline.MutableRequest;
@@ -24,14 +26,9 @@ public class NotificationsTypeFilter implements ApiFilter {
   private static final String LIVE_BLOG_PACKAGE_CONTENT_TYPE = "LiveBlogPackage";
 
   private final JsonConverter converter;
-  private final Policy allTypesPolicy;
-  private final Policy specificTypesPolicy;
 
-  public NotificationsTypeFilter(
-      JsonConverter converter, Policy allTypesPolicy, Policy specificTypesPolicy) {
+  public NotificationsTypeFilter(JsonConverter converter) {
     this.converter = converter;
-    this.allTypesPolicy = allTypesPolicy;
-    this.specificTypesPolicy = specificTypesPolicy;
   }
 
   @Override
@@ -69,10 +66,10 @@ public class NotificationsTypeFilter implements ApiFilter {
     List<String> typeParams = new ArrayList<>();
     List<String> monitorParams = new ArrayList<>();
 
-    if (request.policyIs(allTypesPolicy)) {
+    if (request.policyIs(INTERNAL_UNSTABLE)) {
       typeParams.add(ALL_CONTENT_TYPES);
       monitorParams.add(Boolean.TRUE.toString());
-    } else if (request.policyIs(specificTypesPolicy)) {
+    } else if (request.policyIs(EXTENDED_PULL_NOTIFICATIONS)) {
       typeParams.add(ARTICLE_CONTENT_TYPE);
       typeParams.add(LIVE_BLOG_PACKAGE_CONTENT_TYPE);
       typeParams.add(LIVE_BLOG_POST_CONTENT_TYPE);

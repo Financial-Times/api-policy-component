@@ -41,9 +41,7 @@ public class NotificationsTypeFilterTest {
 
   private final JsonConverter jsonConverter = JsonConverter.testConverter();
 
-  private final NotificationsTypeFilter filter =
-      new NotificationsTypeFilter(
-          jsonConverter, Policy.INTERNAL_UNSTABLE, Policy.EXTENDED_PULL_NOTIFICATIONS);
+  private final NotificationsTypeFilter filter = new NotificationsTypeFilter(jsonConverter);
   private final MutableRequest request = mock(MutableRequest.class);
   private final HttpPipelineChain chain = mock(HttpPipelineChain.class);
   private final MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();

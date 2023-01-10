@@ -16,8 +16,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
 
 public class PolicyBasedJsonFilter implements ApiFilter {
 
@@ -38,7 +36,7 @@ public class PolicyBasedJsonFilter implements ApiFilter {
     return Pattern.compile(regex);
   }
 
-  private final MultivaluedMap<Pattern, String> policyFilters;
+  private final Map<Pattern, List<String>> policyFilters;
   private final JsonConverter jsonConverter;
 
   /**
@@ -47,13 +45,15 @@ public class PolicyBasedJsonFilter implements ApiFilter {
    * @param filters a map of JSONPath to required policy. A mapping to a null policy indicates that
    *     the path is returned in all requests (whitelisted).
    */
-  public PolicyBasedJsonFilter(MultivaluedMap<String, Policy> filters) {
-    this.policyFilters = new MultivaluedHashMap<>();
+  public PolicyBasedJsonFilter(Map<String, List<Policy>> filters) {
+    this.policyFilters = new HashMap<>();
     filters.forEach(
         (k, v) ->
             this.policyFilters.put(
                 jsonPathToRegex(k),
-                (v == null) ? null : v.stream().map(Enum::toString).collect(Collectors.toList())));
+                Optional.ofNullable(v)
+                    .map(f -> f.stream().map(Enum::toString).collect(Collectors.toList()))
+                    .orElse(Collections.emptyList())));
     this.jsonConverter = new JsonConverter(new ObjectMapper());
   }
 
@@ -74,25 +74,30 @@ public class PolicyBasedJsonFilter implements ApiFilter {
     return (httpStatus / 100) == 2;
   }
 
-  private boolean isAllowedPath(String path, Set<String> policies) {
-    for (Map.Entry<Pattern, List<String>> entry : policyFilters.entrySet()) {
-      if (entry.getKey().matcher(path).matches()) {
-        List<String> pathPolicies = entry.getValue();
-        if (pathPolicies == null || pathPolicies.isEmpty()) {
-          return true;
-        }
+  private boolean isAllowedPath(String path, Set<String> requestPolicies) {
+    Optional<Pattern> pathKey =
+        policyFilters.keySet().stream()
+            .filter(pattern -> pattern.matcher(path).matches())
+            .findAny();
 
-        for (String pathPolicy : pathPolicies) {
-          if (policies.contains(pathPolicy)) {
-            return true;
-          }
+    if (pathKey.isPresent()) {
+      List<String> pathPolicies = policyFilters.get(pathKey.get());
+      if (pathPolicies.isEmpty()) {
+        // There's no policy requirement for the path.
+        return true;
+      }
+
+      for (String pathPolicy : pathPolicies) {
+        if (requestPolicies.contains(pathPolicy)) {
+          return true;
         }
       }
     }
 
     FluentLoggingBuilder.getNewInstance(CLASS_NAME, "isAllowedPath")
         .withTransactionId(get("transaction_id"))
-        .withField(MESSAGE, path + " is not allowed by any policies among " + policies.toString())
+        .withField(
+            MESSAGE, path + " is not allowed by any policies among " + requestPolicies.toString())
         .build()
         .logDebug();
 

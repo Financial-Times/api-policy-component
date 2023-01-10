@@ -9,7 +9,6 @@ import com.ft.up.apipolicy.pipeline.ApiFilter;
 import com.ft.up.apipolicy.transformer.BodyProcessingFieldTransformer;
 import com.ft.up.apipolicy.transformer.BodyProcessingFieldTransformerFactory;
 import io.dropwizard.setup.Environment;
-import java.util.Arrays;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -112,8 +111,7 @@ public class ApiFilters {
     addSyndication = new AddSyndication(jsonTweaker);
     brandFilter = new AddBrandFilterParameters(jsonTweaker, resolver);
     linkValidationFilter = new LinkedContentValidationFilter();
-    contentNotificationsFilter =
-        new NotificationsTypeFilter(jsonTweaker, INTERNAL_UNSTABLE, EXTENDED_PULL_NOTIFICATIONS);
+    contentNotificationsFilter = new NotificationsTypeFilter(jsonTweaker);
     accessLevelPropertyFilter =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
             jsonTweaker, INTERNAL_UNSTABLE, ACCESS_LEVEL_JSON_PROPERTY);
@@ -140,10 +138,10 @@ public class ApiFilters {
   }
 
   public ApiFilter notificationsFilter() {
-    return new PolicyBasedJsonFilter(getNotificationsFilters(null));
+    return new PolicyBasedJsonFilter(getNotificationsFilters(false));
   }
 
-  private MultivaluedMap<String, Policy> getNotificationsFilters(Policy... contentTypePolices) {
+  private MultivaluedMap<String, Policy> getNotificationsFilters(boolean includeContentType) {
     MultivaluedMap<String, Policy> notificationsJsonFilters = new MultivaluedHashMap<>();
     // whitelisted (no policy required)
     notificationsJsonFilters.put("$.requestUrl", null);
@@ -157,9 +155,9 @@ public class ApiFilters {
     notificationsJsonFilters.add("$.notifications[*].notificationDate", INCLUDE_LAST_MODIFIED_DATE);
     notificationsJsonFilters.add("$.notifications[*].publishReference", INCLUDE_PROVENANCE);
 
-    if (contentTypePolices != null) {
-      notificationsJsonFilters.put(
-          "$.notifications[*].contentType", Arrays.asList(contentTypePolices));
+    if (includeContentType) {
+      notificationsJsonFilters.add("$.notifications[*].contentType", INTERNAL_UNSTABLE);
+      notificationsJsonFilters.add("$.notifications[*].contentType", EXTENDED_PULL_NOTIFICATIONS);
     }
 
     return notificationsJsonFilters;
@@ -249,8 +247,7 @@ public class ApiFilters {
     return new ApiFilter[] {
       contentNotificationsFilter,
       brandFilter,
-      new PolicyBasedJsonFilter(
-          getNotificationsFilters(INTERNAL_UNSTABLE, EXTENDED_PULL_NOTIFICATIONS))
+      new PolicyBasedJsonFilter(getNotificationsFilters(true))
     };
   }
 
