@@ -42,11 +42,12 @@ public class NotificationsTypeFilterTest {
 
   private final JsonConverter jsonConverter = JsonConverter.testConverter();
 
-  private NotificationsTypeFilter filter =
-      new NotificationsTypeFilter(jsonConverter, Policy.INTERNAL_UNSTABLE);
-  private MutableRequest request = mock(MutableRequest.class);
-  private HttpPipelineChain chain = mock(HttpPipelineChain.class);
-  private MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
+  private final NotificationsTypeFilter filter =
+      new NotificationsTypeFilter(
+          jsonConverter, Policy.INTERNAL_UNSTABLE, Policy.EXTENDED_PULL_NOTIFICATIONS);
+  private final MutableRequest request = mock(MutableRequest.class);
+  private final HttpPipelineChain chain = mock(HttpPipelineChain.class);
+  private final MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
 
   private MutableResponse errorResponse;
   private MutableResponse successResponse;
@@ -73,7 +74,7 @@ public class NotificationsTypeFilterTest {
     filter.processRequest(request, chain);
 
     InOrder inOrder = inOrder(chain, params);
-    inOrder.verify(params).put("type", Collections.singletonList("article"));
+    inOrder.verify(params).put("type", Collections.singletonList("Article"));
     inOrder.verify(chain).callNextFilter(request);
   }
 
@@ -88,7 +89,7 @@ public class NotificationsTypeFilterTest {
     filter.processRequest(request, chain);
 
     InOrder inOrder = inOrder(chain, params);
-    inOrder.verify(params).put("type", Arrays.asList("all"));
+    inOrder.verify(params).put("type", Collections.singletonList("All"));
     inOrder.verify(chain).callNextFilter(request);
   }
 
@@ -103,7 +104,7 @@ public class NotificationsTypeFilterTest {
     filter.processRequest(request, chain);
 
     verify(chain).callNextFilter(request);
-    assertThat(params.get("type"), equalTo(Collections.singletonList("article")));
+    assertThat(params.get("type"), equalTo(Collections.singletonList("Article")));
   }
 
   @Test

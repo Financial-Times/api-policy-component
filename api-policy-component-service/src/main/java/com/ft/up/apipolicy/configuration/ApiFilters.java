@@ -49,7 +49,7 @@ public class ApiFilters {
   private ApiFilter stripLite;
   private ApiFilter stripOpeningXml;
   private ApiFilter linkValidationFilter;
-  private ApiFilter mediaResourceNotificationsFilter;
+  private ApiFilter contentNotificationsFilter;
   private ApiFilter accessLevelPropertyFilter;
   private ApiFilter removeAccessFieldRegardlessOfPolicy;
   private ApiFilter accessLevelHeaderFilter;
@@ -111,7 +111,8 @@ public class ApiFilters {
     addSyndication = new AddSyndication(jsonTweaker);
     brandFilter = new AddBrandFilterParameters(jsonTweaker, resolver);
     linkValidationFilter = new LinkedContentValidationFilter();
-    mediaResourceNotificationsFilter = new NotificationsTypeFilter(jsonTweaker, INTERNAL_UNSTABLE);
+    contentNotificationsFilter =
+        new NotificationsTypeFilter(jsonTweaker, INTERNAL_UNSTABLE, EXTENDED_PULL_NOTIFICATIONS);
     accessLevelPropertyFilter =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
             jsonTweaker, INTERNAL_UNSTABLE, ACCESS_LEVEL_JSON_PROPERTY);
@@ -244,7 +245,7 @@ public class ApiFilters {
 
   public ApiFilter[] contentNotificationsFilters() {
     return new ApiFilter[] {
-      mediaResourceNotificationsFilter,
+      contentNotificationsFilter,
       brandFilter,
       new PolicyBasedJsonFilter(getNotificationsFilters(INTERNAL_UNSTABLE))
     };
