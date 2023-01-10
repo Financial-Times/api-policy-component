@@ -15,7 +15,6 @@ import com.ft.up.apipolicy.configuration.Policy;
 import com.ft.up.apipolicy.pipeline.HttpPipelineChain;
 import com.ft.up.apipolicy.pipeline.MutableRequest;
 import com.ft.up.apipolicy.pipeline.MutableResponse;
-import java.util.Arrays;
 import java.util.Collections;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;

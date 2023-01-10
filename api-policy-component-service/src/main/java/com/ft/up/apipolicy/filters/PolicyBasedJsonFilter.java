@@ -15,6 +15,9 @@ import com.ft.up.apipolicy.util.FluentLoggingBuilder;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 
 public class PolicyBasedJsonFilter implements ApiFilter {
 
@@ -32,12 +35,11 @@ public class PolicyBasedJsonFilter implements ApiFilter {
             .replaceAll("\\*(.+)", Matcher.quoteReplacement("[^.]*") + "$1")
             .replaceAll("\\*$", Matcher.quoteReplacement(".*"));
 
-    Pattern p = Pattern.compile(regex);
-    return p;
+    return Pattern.compile(regex);
   }
 
-  private Map<Pattern, String> policyFilters = new HashMap<>();
-  private JsonConverter jsonConverter = new JsonConverter(new ObjectMapper());
+  private final MultivaluedMap<Pattern, String> policyFilters;
+  private final JsonConverter jsonConverter;
 
   /**
    * Constructor.
@@ -45,9 +47,14 @@ public class PolicyBasedJsonFilter implements ApiFilter {
    * @param filters a map of JSONPath to required policy. A mapping to a null policy indicates that
    *     the path is returned in all requests (whitelisted).
    */
-  public PolicyBasedJsonFilter(Map<String, Policy> filters) {
+  public PolicyBasedJsonFilter(MultivaluedMap<String, Policy> filters) {
+    this.policyFilters = new MultivaluedHashMap<>();
     filters.forEach(
-        (k, v) -> policyFilters.put(jsonPathToRegex(k), (v == null) ? null : v.toString()));
+        (k, v) ->
+            this.policyFilters.put(
+                jsonPathToRegex(k),
+                (v == null) ? null : v.stream().map(Enum::toString).collect(Collectors.toList())));
+    this.jsonConverter = new JsonConverter(new ObjectMapper());
   }
 
   @Override
@@ -68,12 +75,17 @@ public class PolicyBasedJsonFilter implements ApiFilter {
   }
 
   private boolean isAllowedPath(String path, Set<String> policies) {
-    for (Map.Entry<Pattern, String> en : policyFilters.entrySet()) {
-      if (en.getKey().matcher(path).matches()) {
-        String requiredPolicy = en.getValue();
-
-        if ((requiredPolicy == null) || policies.contains(en.getValue())) {
+    for (Map.Entry<Pattern, List<String>> entry : policyFilters.entrySet()) {
+      if (entry.getKey().matcher(path).matches()) {
+        List<String> pathPolicies = entry.getValue();
+        if (pathPolicies == null || pathPolicies.isEmpty()) {
           return true;
+        }
+
+        for (String pathPolicy : pathPolicies) {
+          if (policies.contains(pathPolicy)) {
+            return true;
+          }
         }
       }
     }
