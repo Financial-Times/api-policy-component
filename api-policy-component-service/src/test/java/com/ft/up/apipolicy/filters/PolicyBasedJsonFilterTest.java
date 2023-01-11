@@ -1,5 +1,7 @@
 package com.ft.up.apipolicy.filters;
 
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.SC_NO_CONTENT;
@@ -21,8 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,7 +41,7 @@ public class PolicyBasedJsonFilterTest {
 
   @Test
   public void thatPathMappedToNullPolicyIsWhitelisted() throws Exception {
-    Map<String, Object> object = Collections.singletonMap("foo", "bar");
+    Map<String, Object> object = singletonMap("foo", "bar");
     byte[] entity = MAPPER.writer().writeValueAsBytes(object);
     response.setEntity(entity);
 
@@ -49,9 +49,7 @@ public class PolicyBasedJsonFilterTest {
         .thenReturn(Collections.singleton(Policy.INTERNAL_UNSTABLE.toString()));
     when(chain.callNextFilter(request)).thenReturn(response);
 
-    MultivaluedMap<String, Policy> policies = new MultivaluedHashMap();
-    policies.add("$.foo", null);
-    PolicyBasedJsonFilter f = new PolicyBasedJsonFilter(policies);
+    PolicyBasedJsonFilter f = new PolicyBasedJsonFilter(singletonMap("$.foo", null));
 
     MutableResponse actualResponse = f.processRequest(request, chain);
 
@@ -62,7 +60,7 @@ public class PolicyBasedJsonFilterTest {
 
   @Test
   public void thatPathMappedToPresentPolicyIsPreserved() throws Exception {
-    Map<String, Object> object = Collections.singletonMap("foo", "bar");
+    Map<String, Object> object = singletonMap("foo", "bar");
     byte[] entity = MAPPER.writer().writeValueAsBytes(object);
     response.setEntity(entity);
 
@@ -70,9 +68,8 @@ public class PolicyBasedJsonFilterTest {
         .thenReturn(Collections.singleton(Policy.INTERNAL_UNSTABLE.toString()));
     when(chain.callNextFilter(request)).thenReturn(response);
 
-    MultivaluedMap<String, Policy> policies = new MultivaluedHashMap();
-    policies.add("$.foo", Policy.INTERNAL_UNSTABLE);
-    PolicyBasedJsonFilter f = new PolicyBasedJsonFilter(policies);
+    PolicyBasedJsonFilter f =
+        new PolicyBasedJsonFilter(singletonMap("$.foo", singletonList(Policy.INTERNAL_UNSTABLE)));
 
     MutableResponse actualResponse = f.processRequest(request, chain);
 
@@ -93,9 +90,9 @@ public class PolicyBasedJsonFilterTest {
 
     when(chain.callNextFilter(request)).thenReturn(response);
 
-    MultivaluedMap<String, Policy> policies = new MultivaluedHashMap();
-    policies.add("$.foo", null);
-    policies.add("$.fish", Policy.INTERNAL_UNSTABLE);
+    Map<String, List<Policy>> policies = new HashMap<>();
+    policies.put("$.foo", null);
+    policies.put("$.fish", singletonList(Policy.INTERNAL_UNSTABLE));
     PolicyBasedJsonFilter f = new PolicyBasedJsonFilter(policies);
 
     MutableResponse actualResponse = f.processRequest(request, chain);
@@ -104,7 +101,7 @@ public class PolicyBasedJsonFilterTest {
 
     Map<String, Object> actual =
         MAPPER.readValue(actualResponse.getEntity(), JsonConverter.JSON_MAP_TYPE);
-    Map<String, Object> expected = Collections.singletonMap("foo", "bar");
+    Map<String, Object> expected = singletonMap("foo", "bar");
     assertThat(actual, equalTo(expected));
   }
 
@@ -115,14 +112,12 @@ public class PolicyBasedJsonFilterTest {
   }
 
   @Test
-  public void that204StatusIsHandled() throws Exception {
+  public void that204StatusIsHandled() {
     response.setStatus(SC_NO_CONTENT);
 
     when(chain.callNextFilter(request)).thenReturn(response);
 
-    MultivaluedMap<String, Policy> policies = new MultivaluedHashMap();
-    policies.add("$.foo", null);
-    PolicyBasedJsonFilter f = new PolicyBasedJsonFilter(policies);
+    PolicyBasedJsonFilter f = new PolicyBasedJsonFilter(singletonMap("$.foo", null));
 
     MutableResponse actualResponse = f.processRequest(request, chain);
 
@@ -134,15 +129,14 @@ public class PolicyBasedJsonFilterTest {
 
   @Test
   public void thatNoAllowedPathsReturnsEmptyMap() throws Exception {
-    Map<String, Object> object = Collections.singletonMap("foo", "bar");
+    Map<String, Object> object = singletonMap("foo", "bar");
     byte[] entity = MAPPER.writer().writeValueAsBytes(object);
     response.setEntity(entity);
 
     when(chain.callNextFilter(request)).thenReturn(response);
 
-    MultivaluedMap<String, Policy> policies = new MultivaluedHashMap();
-    policies.add("$.foo", Policy.INTERNAL_UNSTABLE);
-    PolicyBasedJsonFilter f = new PolicyBasedJsonFilter(policies);
+    PolicyBasedJsonFilter f =
+        new PolicyBasedJsonFilter(singletonMap("$.foo", singletonList(Policy.INTERNAL_UNSTABLE)));
 
     MutableResponse actualResponse = f.processRequest(request, chain);
 
@@ -153,8 +147,8 @@ public class PolicyBasedJsonFilterTest {
 
   @Test
   public void thatNestedPathsAreTraversed() throws Exception {
-    Map<String, Object> inner = Collections.singletonMap("bar", "baz");
-    Map<String, Object> object = Collections.singletonMap("foo", inner);
+    Map<String, Object> inner = singletonMap("bar", "baz");
+    Map<String, Object> object = singletonMap("foo", inner);
     byte[] entity = MAPPER.writer().writeValueAsBytes(object);
     response.setEntity(entity);
 
@@ -162,9 +156,9 @@ public class PolicyBasedJsonFilterTest {
         .thenReturn(Collections.singleton(Policy.INTERNAL_UNSTABLE.toString()));
     when(chain.callNextFilter(request)).thenReturn(response);
 
-    MultivaluedMap<String, Policy> policies = new MultivaluedHashMap();
-    policies.add("$.foo.bar", Policy.INTERNAL_UNSTABLE);
-    PolicyBasedJsonFilter f = new PolicyBasedJsonFilter(policies);
+    PolicyBasedJsonFilter f =
+        new PolicyBasedJsonFilter(
+            singletonMap("$.foo.bar", singletonList(Policy.INTERNAL_UNSTABLE)));
 
     MutableResponse actualResponse = f.processRequest(request, chain);
 
@@ -175,8 +169,8 @@ public class PolicyBasedJsonFilterTest {
 
   @Test
   public void thatPathDoesNotDescendIntoNestedObject() throws Exception {
-    Map<String, Object> inner = Collections.singletonMap("bar", "baz");
-    Map<String, Object> object = Collections.singletonMap("foo", inner);
+    Map<String, Object> inner = singletonMap("bar", "baz");
+    Map<String, Object> object = singletonMap("foo", inner);
     byte[] entity = MAPPER.writer().writeValueAsBytes(object);
     response.setEntity(entity);
 
@@ -184,9 +178,8 @@ public class PolicyBasedJsonFilterTest {
         .thenReturn(Collections.singleton(Policy.INTERNAL_UNSTABLE.toString()));
     when(chain.callNextFilter(request)).thenReturn(response);
 
-    MultivaluedMap<String, Policy> policies = new MultivaluedHashMap();
-    policies.add("$.foo", Policy.INTERNAL_UNSTABLE);
-    PolicyBasedJsonFilter f = new PolicyBasedJsonFilter(policies);
+    PolicyBasedJsonFilter f =
+        new PolicyBasedJsonFilter(singletonMap("$.foo", singletonList(Policy.INTERNAL_UNSTABLE)));
 
     MutableResponse actualResponse = f.processRequest(request, chain);
 
@@ -203,8 +196,8 @@ public class PolicyBasedJsonFilterTest {
     Map<String, Object> inner = new HashMap<>();
     inner.put("red", "elephant");
     inner.put("blue", "mouse");
-    Map<String, Object> middle = Collections.singletonMap("bar", inner);
-    Map<String, Object> object = Collections.singletonMap("foo", middle);
+    Map<String, Object> middle = singletonMap("bar", inner);
+    Map<String, Object> object = singletonMap("foo", middle);
     byte[] entity = MAPPER.writer().writeValueAsBytes(object);
     response.setEntity(entity);
 
@@ -212,25 +205,24 @@ public class PolicyBasedJsonFilterTest {
         .thenReturn(Collections.singleton(Policy.INTERNAL_UNSTABLE.toString()));
     when(chain.callNextFilter(request)).thenReturn(response);
 
-    MultivaluedMap<String, Policy> policies = new MultivaluedHashMap();
-    policies.add("$.foo.*.red", Policy.INTERNAL_UNSTABLE);
-    PolicyBasedJsonFilter f = new PolicyBasedJsonFilter(policies);
+    PolicyBasedJsonFilter f =
+        new PolicyBasedJsonFilter(
+            singletonMap("$.foo.*.red", singletonList(Policy.INTERNAL_UNSTABLE)));
 
     MutableResponse actualResponse = f.processRequest(request, chain);
 
     Map<String, Object> actual =
         MAPPER.readValue(actualResponse.getEntity(), JsonConverter.JSON_MAP_TYPE);
     Map<String, Object> expected =
-        Collections.singletonMap(
-            "foo", Collections.singletonMap("bar", Collections.singletonMap("red", "elephant")));
+        singletonMap("foo", singletonMap("bar", singletonMap("red", "elephant")));
     assertThat(actual, equalTo(expected));
   }
 
   @Test
   public void thatWildcardTerminalPreservesDeepObjects() throws Exception {
-    Map<String, Object> inner = Collections.singletonMap("baz", "elephant");
-    Map<String, Object> middle = Collections.singletonMap("bar", inner);
-    Map<String, Object> object = Collections.singletonMap("foo", middle);
+    Map<String, Object> inner = singletonMap("baz", "elephant");
+    Map<String, Object> middle = singletonMap("bar", inner);
+    Map<String, Object> object = singletonMap("foo", middle);
     byte[] entity = MAPPER.writer().writeValueAsBytes(object);
     response.setEntity(entity);
 
@@ -238,9 +230,8 @@ public class PolicyBasedJsonFilterTest {
         .thenReturn(Collections.singleton(Policy.INTERNAL_UNSTABLE.toString()));
     when(chain.callNextFilter(request)).thenReturn(response);
 
-    MultivaluedMap<String, Policy> policies = new MultivaluedHashMap();
-    policies.add("$.foo.*", Policy.INTERNAL_UNSTABLE);
-    PolicyBasedJsonFilter f = new PolicyBasedJsonFilter(policies);
+    PolicyBasedJsonFilter f =
+        new PolicyBasedJsonFilter(singletonMap("$.foo.*", singletonList(Policy.INTERNAL_UNSTABLE)));
 
     MutableResponse actualResponse = f.processRequest(request, chain);
 
@@ -251,10 +242,10 @@ public class PolicyBasedJsonFilterTest {
 
   @Test
   public void thatArraysAreTraversed() throws Exception {
-    Map<String, Object> first = Collections.singletonMap("bar", "baz");
-    Map<String, Object> second = Collections.singletonMap("bar", "wibble");
+    Map<String, Object> first = singletonMap("bar", "baz");
+    Map<String, Object> second = singletonMap("bar", "wibble");
     List<Object> list = Arrays.asList(first, second);
-    Map<String, Object> object = Collections.singletonMap("foo", list);
+    Map<String, Object> object = singletonMap("foo", list);
     byte[] entity = MAPPER.writer().writeValueAsBytes(object);
     response.setEntity(entity);
 
@@ -262,9 +253,9 @@ public class PolicyBasedJsonFilterTest {
         .thenReturn(Collections.singleton(Policy.INTERNAL_UNSTABLE.toString()));
     when(chain.callNextFilter(request)).thenReturn(response);
 
-    MultivaluedMap<String, Policy> policies = new MultivaluedHashMap();
-    policies.add("$.foo[1].bar", Policy.INTERNAL_UNSTABLE);
-    PolicyBasedJsonFilter f = new PolicyBasedJsonFilter(policies);
+    PolicyBasedJsonFilter f =
+        new PolicyBasedJsonFilter(
+            singletonMap("$.foo[1].bar", singletonList(Policy.INTERNAL_UNSTABLE)));
 
     MutableResponse actualResponse = f.processRequest(request, chain);
 
@@ -291,7 +282,7 @@ public class PolicyBasedJsonFilterTest {
     second.put("fish", "blue");
 
     List<Object> list = Arrays.asList(first, second);
-    Map<String, Object> object = Collections.singletonMap("foo", list);
+    Map<String, Object> object = singletonMap("foo", list);
     byte[] entity = MAPPER.writer().writeValueAsBytes(object);
     response.setEntity(entity);
 
@@ -299,9 +290,9 @@ public class PolicyBasedJsonFilterTest {
         .thenReturn(Collections.singleton(Policy.INTERNAL_UNSTABLE.toString()));
     when(chain.callNextFilter(request)).thenReturn(response);
 
-    MultivaluedMap<String, Policy> policies = new MultivaluedHashMap();
-    policies.add("$.foo[*].bar", Policy.INTERNAL_UNSTABLE);
-    PolicyBasedJsonFilter f = new PolicyBasedJsonFilter(policies);
+    PolicyBasedJsonFilter f =
+        new PolicyBasedJsonFilter(
+            Collections.singletonMap("$.foo[*].bar", singletonList(Policy.INTERNAL_UNSTABLE)));
 
     MutableResponse actualResponse = f.processRequest(request, chain);
 
@@ -312,25 +303,24 @@ public class PolicyBasedJsonFilterTest {
     assertThat(foo.size(), equalTo(2));
 
     Map<String, Object> actualFirst = (Map) foo.get(0);
-    Map<String, Object> expectedFirst = Collections.singletonMap("bar", "baz");
+    Map<String, Object> expectedFirst = singletonMap("bar", "baz");
     assertThat(actualFirst, equalTo(expectedFirst));
 
     Map<String, Object> actualSecond = (Map) foo.get(1);
-    Map<String, Object> expectedSecond = Collections.singletonMap("bar", "red");
+    Map<String, Object> expectedSecond = singletonMap("bar", "red");
     assertThat(actualSecond, equalTo(expectedSecond));
   }
 
   @Test
-  public void thatFilterIsTransparentForErrorResponse() throws Exception {
+  public void thatFilterIsTransparentForErrorResponse() {
     String raw = "foobar";
     response.setEntity(raw.getBytes());
     response.setStatus(SC_BAD_REQUEST);
 
     when(chain.callNextFilter(request)).thenReturn(response);
 
-    MultivaluedMap<String, Policy> policies = new MultivaluedHashMap();
-    policies.add("$.foo", Policy.INTERNAL_UNSTABLE);
-    PolicyBasedJsonFilter f = new PolicyBasedJsonFilter(policies);
+    PolicyBasedJsonFilter f =
+        new PolicyBasedJsonFilter(singletonMap("$.foo", singletonList(Policy.INTERNAL_UNSTABLE)));
 
     MutableResponse actualResponse = f.processRequest(request, chain);
 
