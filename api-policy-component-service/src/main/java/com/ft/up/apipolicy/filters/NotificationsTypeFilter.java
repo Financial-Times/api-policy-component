@@ -1,6 +1,6 @@
 package com.ft.up.apipolicy.filters;
 
-import static com.ft.up.apipolicy.configuration.Policy.EXTENDED_PULL_NOTIFICATIONS;
+import static com.ft.up.apipolicy.configuration.Policy.APPEND_LIVE_BLOG_NOTIFICATIONS;
 import static com.ft.up.apipolicy.configuration.Policy.INTERNAL_UNSTABLE;
 
 import com.ft.up.apipolicy.JsonConverter;
@@ -69,7 +69,7 @@ public class NotificationsTypeFilter implements ApiFilter {
     if (request.policyIs(INTERNAL_UNSTABLE)) {
       typeParams.add(ALL_CONTENT_TYPES);
       monitorParams.add(Boolean.TRUE.toString());
-    } else if (request.policyIs(EXTENDED_PULL_NOTIFICATIONS)) {
+    } else if (request.policyIs(APPEND_LIVE_BLOG_NOTIFICATIONS)) {
       typeParams.add(ARTICLE_CONTENT_TYPE);
       typeParams.add(LIVE_BLOG_PACKAGE_CONTENT_TYPE);
       typeParams.add(LIVE_BLOG_POST_CONTENT_TYPE);

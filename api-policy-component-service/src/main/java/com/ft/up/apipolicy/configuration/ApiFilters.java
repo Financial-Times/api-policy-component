@@ -157,7 +157,8 @@ public class ApiFilters {
 
     if (includeContentType) {
       notificationsJsonFilters.add("$.notifications[*].contentType", INTERNAL_UNSTABLE);
-      notificationsJsonFilters.add("$.notifications[*].contentType", EXTENDED_PULL_NOTIFICATIONS);
+      notificationsJsonFilters.add(
+          "$.notifications[*].contentType", APPEND_LIVE_BLOG_NOTIFICATIONS);
     }
 
     return notificationsJsonFilters;

@@ -92,7 +92,7 @@ public class NotificationsTypeFilterTest {
 
   @Test
   public void testThatExtendedTypesAreAddedWhenPolicyIsPresent() {
-    when(request.policyIs(Policy.EXTENDED_PULL_NOTIFICATIONS)).thenReturn(true);
+    when(request.policyIs(Policy.APPEND_LIVE_BLOG_NOTIFICATIONS)).thenReturn(true);
     when(request.getQueryParameters()).thenReturn(params);
     when(chain.callNextFilter(request)).thenReturn(successResponse);
 

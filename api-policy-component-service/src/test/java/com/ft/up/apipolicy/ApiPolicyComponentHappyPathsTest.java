@@ -1364,7 +1364,7 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
                     .withStatus(200)));
 
     MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
-    headers.add(HttpPipeline.POLICY_HEADER_NAME, Policy.EXTENDED_PULL_NOTIFICATIONS);
+    headers.add(HttpPipeline.POLICY_HEADER_NAME, Policy.APPEND_LIVE_BLOG_NOTIFICATIONS);
     headers.add(HttpPipeline.POLICY_HEADER_NAME, Policy.INCLUDE_LAST_MODIFIED_DATE);
 
     final Response response = client.target(uri).request().headers(headers).get();
