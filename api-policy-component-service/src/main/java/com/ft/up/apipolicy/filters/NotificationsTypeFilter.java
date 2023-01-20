@@ -1,5 +1,6 @@
 package com.ft.up.apipolicy.filters;
 
+import static com.ft.up.apipolicy.configuration.Policy.ADVANCED_NOTIFICATIONS;
 import static com.ft.up.apipolicy.configuration.Policy.APPEND_LIVE_BLOG_NOTIFICATIONS;
 import static com.ft.up.apipolicy.configuration.Policy.INTERNAL_UNSTABLE;
 
@@ -20,6 +21,7 @@ public class NotificationsTypeFilter implements ApiFilter {
   private static final String HREF_KEY = "href";
   private static final String TYPE_KEY = "type";
   private static final String MONITOR_KEY = "monitor";
+  private static final String HIDE_CREATE_EVENTS_KEY = "hideCreate";
   private static final String ALL_CONTENT_TYPES = "All";
   private static final String ARTICLE_CONTENT_TYPE = "Article";
   private static final String LIVE_BLOG_POST_CONTENT_TYPE = "LiveBlogPost";
@@ -65,6 +67,7 @@ public class NotificationsTypeFilter implements ApiFilter {
   private void addQueryParams(MutableRequest request) {
     List<String> typeParams = new ArrayList<>();
     List<String> monitorParams = new ArrayList<>();
+    List<String> hideCreateEventsParams = new ArrayList<>();
 
     if (request.policyIs(INTERNAL_UNSTABLE)) {
       typeParams.add(ALL_CONTENT_TYPES);
@@ -79,6 +82,13 @@ public class NotificationsTypeFilter implements ApiFilter {
       monitorParams.add(Boolean.FALSE.toString());
     }
 
+    if (request.policyIs(ADVANCED_NOTIFICATIONS)) {
+      hideCreateEventsParams.add(Boolean.FALSE.toString());
+    } else {
+      hideCreateEventsParams.add(Boolean.TRUE.toString());
+    }
+
+    request.getQueryParameters().put(HIDE_CREATE_EVENTS_KEY, hideCreateEventsParams);
     request.getQueryParameters().put(TYPE_KEY, typeParams);
     request.getQueryParameters().put(MONITOR_KEY, monitorParams);
   }

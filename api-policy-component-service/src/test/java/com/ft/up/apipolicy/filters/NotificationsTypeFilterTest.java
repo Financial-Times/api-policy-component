@@ -162,7 +162,8 @@ public class NotificationsTypeFilterTest {
     filter.processRequest(request, chain);
 
     verify(request).policyIs(Policy.INTERNAL_UNSTABLE);
-    verify(request, times(2)).getQueryParameters();
+    verify(request).policyIs(Policy.ADVANCED_NOTIFICATIONS);
+    verify(request, times(3)).getQueryParameters();
     verifyNoMoreInteractions(request);
   }
 
