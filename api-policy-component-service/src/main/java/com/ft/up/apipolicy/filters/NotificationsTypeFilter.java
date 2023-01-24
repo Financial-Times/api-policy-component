@@ -1,7 +1,9 @@
 package com.ft.up.apipolicy.filters;
 
+import static com.ft.up.apipolicy.configuration.Policy.APPEND_LIVE_BLOG_NOTIFICATIONS;
+import static com.ft.up.apipolicy.configuration.Policy.INTERNAL_UNSTABLE;
+
 import com.ft.up.apipolicy.JsonConverter;
-import com.ft.up.apipolicy.configuration.Policy;
 import com.ft.up.apipolicy.pipeline.ApiFilter;
 import com.ft.up.apipolicy.pipeline.HttpPipelineChain;
 import com.ft.up.apipolicy.pipeline.MutableRequest;
@@ -18,13 +20,15 @@ public class NotificationsTypeFilter implements ApiFilter {
   private static final String HREF_KEY = "href";
   private static final String TYPE_KEY = "type";
   private static final String MONITOR_KEY = "monitor";
+  private static final String ALL_CONTENT_TYPES = "All";
+  private static final String ARTICLE_CONTENT_TYPE = "Article";
+  private static final String LIVE_BLOG_POST_CONTENT_TYPE = "LiveBlogPost";
+  private static final String LIVE_BLOG_PACKAGE_CONTENT_TYPE = "LiveBlogPackage";
 
-  private JsonConverter converter;
-  private Policy policy;
+  private final JsonConverter converter;
 
-  public NotificationsTypeFilter(JsonConverter converter, Policy policy) {
+  public NotificationsTypeFilter(JsonConverter converter) {
     this.converter = converter;
-    this.policy = policy;
   }
 
   @Override
@@ -60,18 +64,22 @@ public class NotificationsTypeFilter implements ApiFilter {
 
   private void addQueryParams(MutableRequest request) {
     List<String> typeParams = new ArrayList<>();
-    boolean hasRequiredPolicy = request.policyIs(policy);
-    if (hasRequiredPolicy) {
-      typeParams.add("all");
+    List<String> monitorParams = new ArrayList<>();
+
+    if (request.policyIs(INTERNAL_UNSTABLE)) {
+      typeParams.add(ALL_CONTENT_TYPES);
+      monitorParams.add(Boolean.TRUE.toString());
+    } else if (request.policyIs(APPEND_LIVE_BLOG_NOTIFICATIONS)) {
+      typeParams.add(ARTICLE_CONTENT_TYPE);
+      typeParams.add(LIVE_BLOG_PACKAGE_CONTENT_TYPE);
+      typeParams.add(LIVE_BLOG_POST_CONTENT_TYPE);
+      monitorParams.add(Boolean.FALSE.toString());
     } else {
-      typeParams.add("article");
+      typeParams.add(ARTICLE_CONTENT_TYPE);
+      monitorParams.add(Boolean.FALSE.toString());
     }
 
     request.getQueryParameters().put(TYPE_KEY, typeParams);
-
-    List<String> monitorParams = new ArrayList<>();
-    monitorParams.add(String.valueOf(hasRequiredPolicy));
-
     request.getQueryParameters().put(MONITOR_KEY, monitorParams);
   }
 

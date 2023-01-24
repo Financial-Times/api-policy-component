@@ -25,33 +25,35 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
+import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NotificationsTypeFilterTest {
 
-  public static final String ERROR_RESPONSE = "{ \"message\" : \"Error\" }";
-  public static final String SUCCESS_RESPONSE =
+  private static final String ERROR_RESPONSE = "{ \"message\" : \"Error\" }";
+  private static final String SUCCESS_RESPONSE =
       "{ \"requestUrl\":"
           + " \"http://example.org/content/notifications?since=2016-07-23T00:00:00.000Z&type=article&type=mediaResource&monitor=false\","
           + " \"links\": [ {\"href\":"
           + " \"http://example.org/content/100?since=2016-07-23T00:00:00.000Z&type=article&type=mediaResource&monitor=false\","
           + " \"rel\" : \"next\"}] }";
-  public static final String STRIPPED_SUCCESS_RESPONSE =
+  private static final String STRIPPED_SUCCESS_RESPONSE =
       "{\"requestUrl\":\"http://example.org/content/notifications?since=2016-07-23T00:00:00.000Z\",\"links\":[{\"href\":\"http://example.org/content/100?since=2016-07-23T00:00:00.000Z\",\"rel\":\"next\"}]}";
 
   private final JsonConverter jsonConverter = JsonConverter.testConverter();
 
-  private NotificationsTypeFilter filter =
-      new NotificationsTypeFilter(jsonConverter, Policy.INTERNAL_UNSTABLE);
-  private MutableRequest request = mock(MutableRequest.class);
-  private HttpPipelineChain chain = mock(HttpPipelineChain.class);
-  private MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
+  private final NotificationsTypeFilter filter = new NotificationsTypeFilter(jsonConverter);
+  private final MutableRequest request = mock(MutableRequest.class);
+  private final HttpPipelineChain chain = mock(HttpPipelineChain.class);
+  private final MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
 
   private MutableResponse errorResponse;
   private MutableResponse successResponse;
 
   @Rule public ExpectedException expectedException = ExpectedException.none();
+
+  @Mock private MultivaluedMap<String, String> params;
 
   @Before
   public void setUp() {
@@ -63,37 +65,47 @@ public class NotificationsTypeFilterTest {
   }
 
   @Test
-  public void testThatArticleTypeQueryParamIsAddedWhenNoPolicyIsPresent() throws Exception {
+  public void testThatArticleTypeQueryParamIsAddedWhenNoPolicyIsPresent() {
     when(request.policyIs(Policy.INCLUDE_PROVENANCE)).thenReturn(false);
-    @SuppressWarnings("unchecked")
-    MultivaluedMap<String, String> params = mock(MultivaluedMap.class);
     when(request.getQueryParameters()).thenReturn(params);
     when(chain.callNextFilter(request)).thenReturn(successResponse);
 
     filter.processRequest(request, chain);
 
     InOrder inOrder = inOrder(chain, params);
-    inOrder.verify(params).put("type", Collections.singletonList("article"));
+    inOrder.verify(params).put("type", Collections.singletonList("Article"));
     inOrder.verify(chain).callNextFilter(request);
   }
 
   @Test
-  public void testThatMediaResourceTypeQueryParamIsAddedWhenPolicyIsPresent() throws Exception {
+  public void testThatMediaResourceTypeQueryParamIsAddedWhenPolicyIsPresent() {
     when(request.policyIs(Policy.INTERNAL_UNSTABLE)).thenReturn(true);
-    @SuppressWarnings("unchecked")
-    MultivaluedMap<String, String> params = mock(MultivaluedMap.class);
     when(request.getQueryParameters()).thenReturn(params);
     when(chain.callNextFilter(request)).thenReturn(successResponse);
 
     filter.processRequest(request, chain);
 
     InOrder inOrder = inOrder(chain, params);
-    inOrder.verify(params).put("type", Arrays.asList("all"));
+    inOrder.verify(params).put("type", Collections.singletonList("All"));
     inOrder.verify(chain).callNextFilter(request);
   }
 
   @Test
-  public void testIncomingQueryParamsCannotOverwritePolicyRestriction() throws Exception {
+  public void testThatExtendedTypesAreAddedWhenPolicyIsPresent() {
+    when(request.policyIs(Policy.APPEND_LIVE_BLOG_NOTIFICATIONS)).thenReturn(true);
+    when(request.getQueryParameters()).thenReturn(params);
+    when(chain.callNextFilter(request)).thenReturn(successResponse);
+
+    filter.processRequest(request, chain);
+
+    InOrder inOrder = inOrder(chain, params);
+    inOrder.verify(params).put("type", Arrays.asList("Article", "LiveBlogPackage", "LiveBlogPost"));
+    inOrder.verify(params).put("monitor", Collections.singletonList("false"));
+    inOrder.verify(chain).callNextFilter(request);
+  }
+
+  @Test
+  public void testIncomingQueryParamsCannotOverwritePolicyRestriction() {
     when(request.policyIs(Policy.INTERNAL_UNSTABLE)).thenReturn(false);
     MultivaluedMap<String, String> params = new MultivaluedHashMap<>();
     params.putSingle("type", "mediaResource");
@@ -103,13 +115,12 @@ public class NotificationsTypeFilterTest {
     filter.processRequest(request, chain);
 
     verify(chain).callNextFilter(request);
-    assertThat(params.get("type"), equalTo(Collections.singletonList("article")));
+    assertThat(params.get("type"), equalTo(Collections.singletonList("Article")));
   }
 
   @Test
   public void testThatMonitorQueryParamIsSetToTrueWhenPolicyIsPresent() {
     when(request.policyIs(Policy.INTERNAL_UNSTABLE)).thenReturn(true);
-    MultivaluedMap<String, String> params = mock(MultivaluedMap.class);
     when(request.getQueryParameters()).thenReturn(params);
     when(chain.callNextFilter(request)).thenReturn(successResponse);
 
@@ -121,7 +132,6 @@ public class NotificationsTypeFilterTest {
   @Test
   public void testThatMonitorQueryParamIsSetToFalseWhenPolicyIsNotPresent() {
     when(request.policyIs(Policy.INTERNAL_UNSTABLE)).thenReturn(false);
-    MultivaluedMap<String, String> params = mock(MultivaluedMap.class);
     when(request.getQueryParameters()).thenReturn(params);
     when(chain.callNextFilter(request)).thenReturn(successResponse);
 
@@ -146,7 +156,6 @@ public class NotificationsTypeFilterTest {
   @Test
   public void testThatForNon200ResponseNoOtherInteractionHappens() {
     when(request.policyIs(Policy.INTERNAL_UNSTABLE)).thenReturn(true);
-    MultivaluedMap<String, String> params = mock(MultivaluedMap.class);
     when(request.getQueryParameters()).thenReturn(params);
     when(chain.callNextFilter(request)).thenReturn(errorResponse);
 
@@ -159,7 +168,6 @@ public class NotificationsTypeFilterTest {
 
   @Test
   public void testThatFilterExceptionIsThrownWhenUnexpectedJSONFieldTypes() {
-    MultivaluedMap<String, String> params = mock(MultivaluedMap.class);
     when(request.getQueryParameters()).thenReturn(params);
 
     MutableResponse badResponse = new MutableResponse(headers, "{ \"requestUrl\": [] }".getBytes());
@@ -173,7 +181,6 @@ public class NotificationsTypeFilterTest {
 
   @Test
   public void testThatForResponseWithEmptyLinksArrayTypeParamsInURLsAreStripped() {
-    MultivaluedMap<String, String> params = mock(MultivaluedMap.class);
     when(request.getQueryParameters()).thenReturn(params);
 
     String responseBody =
@@ -189,12 +196,11 @@ public class NotificationsTypeFilterTest {
 
     MutableResponse returned = filter.processRequest(request, chain);
 
-    assertThat("", returned.getEntityAsString(), is(strippedBody));
+    assertThat(returned.getEntityAsString(), is(strippedBody));
   }
 
   @Test
   public void testThatForHappyResponseTypeParamsInURLsAreStripped() {
-    MultivaluedMap<String, String> params = mock(MultivaluedMap.class);
     when(request.getQueryParameters()).thenReturn(params);
 
     MutableResponse happyResponse = new MutableResponse(headers, SUCCESS_RESPONSE.getBytes());
@@ -203,6 +209,6 @@ public class NotificationsTypeFilterTest {
 
     MutableResponse returned = filter.processRequest(request, chain);
 
-    assertThat("", returned.getEntityAsString(), is(STRIPPED_SUCCESS_RESPONSE));
+    assertThat(returned.getEntityAsString(), is(STRIPPED_SUCCESS_RESPONSE));
   }
 }

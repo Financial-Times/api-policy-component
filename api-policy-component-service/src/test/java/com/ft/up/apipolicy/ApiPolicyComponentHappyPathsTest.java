@@ -54,9 +54,7 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.*;
 import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.JerseyClientBuilder;
@@ -74,6 +72,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Simon.Gibbs
  */
+@SuppressWarnings("rawtypes")
 public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
 
   @ClassRule
@@ -123,7 +122,6 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
   private static final String LIST_UUID = "9125b25e-8305-11e5-8317-6f9588949b85";
   private static final String LISTS_BASE_PATH = "/lists";
   private static final String LISTS_PATH = LISTS_BASE_PATH + "/" + LIST_UUID;
-  private static final String PAGE_UUID = "9125b25e-8305-11e5-8317-6f9588949b86";
   private static final String PAGES_BASE_PATH = "/pages";
   private static final String PARAM_VALIDATE_LINKS = "validateLinkedResources";
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -310,6 +308,7 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
           + "\"id\": \"http://www.ft.com/thing/a1d6ca52-f9aa-407e-b682-03052dea7e25\", "
           + "\"apiUrl\": \"http://int.api.ft.com/content/a1d6ca52-f9aa-407e-b682-03052dea7e25\", "
           + "\"publishReference\": \"tid_AbCd1203\", "
+          + "\"contentType\": \"Article\", "
           + "\"lastModified\": \"2015-12-13T17:04:54.636Z\""
           + " } ";
   private static final String INTERNAL_CONTENT_JSON =
@@ -399,10 +398,9 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
   private final Client client = getClient();
 
   private Client getClient() {
-    final Client tmpClient =
-        JerseyClientBuilder.newBuilder().property(ClientProperties.FOLLOW_REDIRECTS, false).build();
-
-    return tmpClient;
+    return JerseyClientBuilder.newBuilder()
+        .property(ClientProperties.FOLLOW_REDIRECTS, false)
+        .build();
   }
 
   public void givenEverythingSetup() {
@@ -890,7 +888,7 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
   }
 
   @Test
-  public void givenPolicyINTERNAL_UNSTABLEShouldGetContentCollection() throws IOException {
+  public void givenPolicyINTERNAL_UNSTABLEShouldGetContentCollection() {
     givenEverythingSetup();
     final URI uri = fromFacade(ENRICHED_CONTENT_PATH).build();
     stubFor(
@@ -918,7 +916,7 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
   }
 
   @Test
-  public void givenNoINTERNAL_UNSTABLEPolicyShouldNotGetContentCollection() throws IOException {
+  public void givenNoINTERNAL_UNSTABLEPolicyShouldNotGetContentCollection() {
     givenEverythingSetup();
     final URI uri = fromFacade(ENRICHED_CONTENT_PATH).build();
     stubFor(
@@ -980,8 +978,7 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
       String type,
       Collection<String> forBrands,
       Collection<String> notForBrands,
-      String responseBody)
-      throws IOException {
+      String responseBody) {
     MappingBuilder request =
         get(urlPathEqualTo(NOTIFICATIONS_PATH)).withQueryParam(SINCE, equalTo(encode(sinceDate)));
     if (type != null) {
@@ -1128,7 +1125,7 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
   }
 
   @Test
-  public void shouldLeaveLastModifiedInJsonWhenPolicyIncludeIsPresentForLists() throws Exception {
+  public void shouldLeaveLastModifiedInJsonWhenPolicyIncludeIsPresentForLists() {
     givenEverythingSetup();
     final URI uri = fromFacade(LISTS_PATH).build();
     stubFor(
@@ -1155,12 +1152,11 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
   }
 
   @Test
-  public void shouldForwardListsCallWithQueryParameters() throws Exception {
+  public void shouldForwardListsCallWithQueryParameters() {
     givenEverythingSetup();
 
     final URI uri =
-        fromFacade(LISTS_BASE_PATH, ImmutableMap.of(QUERY_PARAM_NAME, (Object) QUERY_PARAM_VALUE))
-            .build();
+        fromFacade(LISTS_BASE_PATH, ImmutableMap.of(QUERY_PARAM_NAME, QUERY_PARAM_VALUE)).build();
     stubFor(
         get(urlPathEqualTo(LISTS_BASE_PATH))
             .withQueryParam(QUERY_PARAM_NAME, equalTo(QUERY_PARAM_VALUE))
@@ -1173,14 +1169,14 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
     try {
       verify(getRequestedFor(urlPathMatching(LISTS_BASE_PATH)));
       assertThat(response.getStatus(), is(200));
-      // assertThat(response.readEntity(String.class), not(containsJsonProperty("lastModified")));
+      assertThat(response.readEntity(String.class), not(containsJsonProperty("lastModified")));
     } finally {
       response.close();
     }
   }
 
   @Test
-  public void shouldForwardListsNotificationsCall() throws Exception {
+  public void shouldForwardListsNotificationsCall() {
     givenEverythingSetup();
 
     final URI uri = fromFacade(LISTS_BASE_PATH + "/notifications").build();
@@ -1205,7 +1201,7 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
   }
 
   @Test
-  public void shouldForwardPageNotificationsCall() throws Exception {
+  public void shouldForwardPageNotificationsCall() {
     givenEverythingSetup();
 
     final URI uri = fromFacade(PAGES_BASE_PATH + "/notifications").build();
@@ -1230,7 +1226,7 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
   }
 
   @Test
-  public void shouldRemoveLastModifiedFromJsonForLists() throws Exception {
+  public void shouldRemoveLastModifiedFromJsonForLists() {
     givenEverythingSetup();
     final URI uri = fromFacade(LISTS_PATH).build();
     stubFor(
@@ -1343,6 +1339,7 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
       String jsonPayload = response.readEntity(String.class);
       assertThat(jsonPayload, not(containsNestedJsonProperty("notifications", "publishReference")));
       assertThat(jsonPayload, not(containsNestedJsonProperty("notifications", "lastModified")));
+      assertThat(jsonPayload, not(containsNestedJsonProperty("notifications", "contentType")));
       assertThat(jsonPayload, containsNestedJsonProperty("notifications", "type"));
       assertThat(jsonPayload, containsNestedJsonProperty("notifications", "id"));
       assertThat(jsonPayload, containsNestedJsonProperty("notifications", "apiUrl"));
@@ -1353,8 +1350,7 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
   }
 
   @Test
-  public void shouldLeaveLastModifiedAndLeaveAllOthersInJSONForNotifications()
-      throws UnsupportedEncodingException {
+  public void shouldLeaveLastModifiedAndLeaveAllOthersInJSONForNotifications() {
     givenEverythingSetup();
     String sinceDate = NOTIFICATIONS_SINCE_DATE;
     final URI uri = fromFacade(NOTIFICATIONS_PATH).queryParam(SINCE, sinceDate).build();
@@ -1366,19 +1362,19 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
                     .withBody(ALL_NOTIFICATIONS_JSON)
                     .withHeader("Content-Type", MediaType.APPLICATION_JSON)
                     .withStatus(200)));
-    final Response response =
-        client
-            .target(uri)
-            .request()
-            .header(
-                HttpPipeline.POLICY_HEADER_NAME, Policy.INCLUDE_LAST_MODIFIED_DATE.getHeaderValue())
-            .get();
+
+    MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
+    headers.add(HttpPipeline.POLICY_HEADER_NAME, Policy.APPEND_LIVE_BLOG_NOTIFICATIONS);
+    headers.add(HttpPipeline.POLICY_HEADER_NAME, Policy.INCLUDE_LAST_MODIFIED_DATE);
+
+    final Response response = client.target(uri).request().headers(headers).get();
     try {
       verify(
           getRequestedFor(urlPathEqualTo(NOTIFICATIONS_PATH))
               .withQueryParam(SINCE, equalTo(sinceDate)));
       assertThat(response.getStatus(), is(200));
       String jsonPayload = response.readEntity(String.class);
+      assertThat(jsonPayload, containsNestedJsonProperty("notifications", "contentType"));
       assertThat(jsonPayload, containsNestedJsonProperty("notifications", "lastModified"));
       assertThat(jsonPayload, not(containsNestedJsonProperty("notifications", "publishReference")));
       assertThat(jsonPayload, containsNestedJsonProperty("notifications", "type"));
@@ -1400,7 +1396,7 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
   }
 
   @Test
-  public void shouldReturnRedirect() throws Exception {
+  public void shouldReturnRedirect() {
     givenEverythingSetup();
     final URI uri = fromFacade(CONCEPT_PATH_REDIRECT).build();
     stubFor(
@@ -1529,7 +1525,7 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
       Map<String, Object> result = expectOKResponseWithJSON(response);
       Map<String, Object> jsonExpected =
           OBJECT_MAPPER.readValue(INTERNAL_CONTENT_UNROLLED_CONTENT_JSON, JSON_MAP_TYPE);
-      assertTrue(result.equals(jsonExpected));
+      assertEquals(result, jsonExpected);
     } finally {
       response.close();
     }
@@ -1563,7 +1559,7 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
           getRequestedFor(urlPathEqualTo(INTERNAL_CONTENT_PATH))
               .withQueryParam("unrollContent", equalTo("true")));
       Map<String, Object> result = expectOKResponseWithJSON(response);
-      assertTrue(((Map) result.get("mainImage")).size() == 1);
+      assertEquals(1, ((Map) result.get("mainImage")).size());
       assertNull(result.get("embeds"));
     } finally {
       response.close();
@@ -1600,9 +1596,9 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
       Map<String, Object> result = expectOKResponseWithJSON(response);
       Map<String, Object> jsonExpected =
           OBJECT_MAPPER.readValue(INTERNAL_CONTENT_UNROLLED_CONTENT_JSON, JSON_MAP_TYPE);
-      assertTrue(result.equals(jsonExpected));
+      assertEquals(result, jsonExpected);
       ArrayList leadImages = (ArrayList) result.get("leadImages");
-      assertTrue(leadImages.size() == 3);
+      assertEquals(3, leadImages.size());
       assertTrue(((Map) (((Map) (leadImages.get(0))).get("image"))).size() > 1);
       assertTrue(((Map) (((Map) (leadImages.get(1))).get("image"))).size() > 1);
       assertTrue(((Map) (((Map) (leadImages.get(2))).get("image"))).size() > 1);
@@ -1639,7 +1635,7 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
           getRequestedFor(urlPathEqualTo(INTERNAL_CONTENT_PREVIEW_PATH))
               .withQueryParam("unrollContent", equalTo("true")));
       Map<String, Object> result = expectOKResponseWithJSON(response);
-      assertTrue(((Map) result.get("mainImage")).size() == 1);
+      assertEquals(1, ((Map) result.get("mainImage")).size());
       assertNull(result.get("embeds"));
     } finally {
       response.close();
@@ -1711,7 +1707,7 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
           getRequestedFor(urlPathEqualTo(ENRICHED_CONTENT_PATH_2))
               .withQueryParam("unrollContent", equalTo("true")));
       Map<String, Object> result = expectOKResponseWithJSON(response);
-      assertTrue(((Map) result.get("mainImage")).size() == 1);
+      assertEquals(1, ((Map) result.get("mainImage")).size());
       assertNull(result.get("embeds"));
       assertThat(((Map) result.get("alternativeImages")).size(), equalTo(0));
     } finally {
@@ -1783,7 +1779,7 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
           getRequestedFor(urlPathEqualTo(CONTENT_PREVIEW_PATH))
               .withQueryParam("unrollContent", equalTo("true")));
       Map<String, Object> result = expectOKResponseWithJSON(response);
-      assertTrue(((Map) result.get("mainImage")).size() == 1);
+      assertEquals(1, ((Map) result.get("mainImage")).size());
       assertNull(result.get("embeds"));
       assertThat(((Map) result.get("alternativeImages")).size(), equalTo(0));
     } finally {

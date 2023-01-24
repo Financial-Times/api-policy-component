@@ -9,8 +9,8 @@ import com.ft.up.apipolicy.pipeline.ApiFilter;
 import com.ft.up.apipolicy.transformer.BodyProcessingFieldTransformer;
 import com.ft.up.apipolicy.transformer.BodyProcessingFieldTransformerFactory;
 import io.dropwizard.setup.Environment;
-import java.util.HashMap;
-import java.util.Map;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 
 public class ApiFilters {
 
@@ -49,7 +49,7 @@ public class ApiFilters {
   private ApiFilter stripLite;
   private ApiFilter stripOpeningXml;
   private ApiFilter linkValidationFilter;
-  private ApiFilter mediaResourceNotificationsFilter;
+  private ApiFilter contentNotificationsFilter;
   private ApiFilter accessLevelPropertyFilter;
   private ApiFilter removeAccessFieldRegardlessOfPolicy;
   private ApiFilter accessLevelHeaderFilter;
@@ -111,7 +111,7 @@ public class ApiFilters {
     addSyndication = new AddSyndication(jsonTweaker);
     brandFilter = new AddBrandFilterParameters(jsonTweaker, resolver);
     linkValidationFilter = new LinkedContentValidationFilter();
-    mediaResourceNotificationsFilter = new NotificationsTypeFilter(jsonTweaker, INTERNAL_UNSTABLE);
+    contentNotificationsFilter = new NotificationsTypeFilter(jsonTweaker);
     accessLevelPropertyFilter =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
             jsonTweaker, INTERNAL_UNSTABLE, ACCESS_LEVEL_JSON_PROPERTY);
@@ -138,11 +138,11 @@ public class ApiFilters {
   }
 
   public ApiFilter notificationsFilter() {
-    return new PolicyBasedJsonFilter(notificationsFiltersMap());
+    return new PolicyBasedJsonFilter(getNotificationsFilters(false));
   }
 
-  private Map<String, Policy> notificationsFiltersMap() {
-    Map<String, Policy> notificationsJsonFilters = new HashMap<>();
+  private MultivaluedMap<String, Policy> getNotificationsFilters(boolean includeContentType) {
+    MultivaluedMap<String, Policy> notificationsJsonFilters = new MultivaluedHashMap<>();
     // whitelisted (no policy required)
     notificationsJsonFilters.put("$.requestUrl", null);
     notificationsJsonFilters.put("$.links[*].*", null);
@@ -151,9 +151,15 @@ public class ApiFilters {
     notificationsJsonFilters.put("$.notifications[*].subType", null);
     notificationsJsonFilters.put("$.notifications[*].apiUrl", null);
     // restricted (policy required)
-    notificationsJsonFilters.put("$.notifications[*].lastModified", INCLUDE_LAST_MODIFIED_DATE);
-    notificationsJsonFilters.put("$.notifications[*].notificationDate", INCLUDE_LAST_MODIFIED_DATE);
-    notificationsJsonFilters.put("$.notifications[*].publishReference", INCLUDE_PROVENANCE);
+    notificationsJsonFilters.add("$.notifications[*].lastModified", INCLUDE_LAST_MODIFIED_DATE);
+    notificationsJsonFilters.add("$.notifications[*].notificationDate", INCLUDE_LAST_MODIFIED_DATE);
+    notificationsJsonFilters.add("$.notifications[*].publishReference", INCLUDE_PROVENANCE);
+
+    if (includeContentType) {
+      notificationsJsonFilters.add("$.notifications[*].contentType", INTERNAL_UNSTABLE);
+      notificationsJsonFilters.add(
+          "$.notifications[*].contentType", APPEND_LIVE_BLOG_NOTIFICATIONS);
+    }
 
     return notificationsJsonFilters;
   }
@@ -239,11 +245,10 @@ public class ApiFilters {
   }
 
   public ApiFilter[] contentNotificationsFilters() {
-    Map<String, Policy> notificationsFilters = notificationsFiltersMap();
-    notificationsFilters.put("$.notifications[*].contentType", INTERNAL_UNSTABLE);
-
     return new ApiFilter[] {
-      mediaResourceNotificationsFilter, brandFilter, new PolicyBasedJsonFilter(notificationsFilters)
+      contentNotificationsFilter,
+      brandFilter,
+      new PolicyBasedJsonFilter(getNotificationsFilters(true))
     };
   }
 
