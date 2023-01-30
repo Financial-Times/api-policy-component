@@ -298,4 +298,14 @@ public class ApiFilters {
       internalAnalyticsTagsFilter
     };
   }
+
+  public ApiFilter[] liveEventsFilter() {
+    return new ApiFilter[] {
+      stripProvenance,
+      stripLastModifiedDate,
+      identifiersFilter,
+      alternativeStandfirstsFilter,
+      alternativeTitlesFilter
+    };
+  }
 }
