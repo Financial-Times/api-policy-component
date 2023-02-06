@@ -174,6 +174,13 @@ public class ApiPolicyApplication extends Application<ApiPolicyConfiguration> {
             apiFilters.contentPreviewFilters()));
     knownWildcardEndpoints.add(
         createEndpoint(environment, configuration, "^/concordances.*", "concordances"));
+    knownWildcardEndpoints.add(
+        createEndpoint(
+            environment,
+            configuration,
+            "^/live-events.*",
+            "live-events",
+            apiFilters.liveEventsFilter()));
     // DEFAULT CASE: Just forward it
     knownWildcardEndpoints.add(createEndpoint(environment, configuration, "^/.*", "other"));
 
