@@ -14,6 +14,7 @@ public interface ApiFilter {
   String MEMBERS = "members";
   String LEAD_IMAGES = "leadImages";
   String IMAGE = "image";
+  String CONTENT_TYPE = "type";
 
   MutableResponse processRequest(MutableRequest request, HttpPipelineChain chain);
 }

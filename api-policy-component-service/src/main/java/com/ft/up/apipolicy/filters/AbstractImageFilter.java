@@ -9,10 +9,18 @@ import org.apache.http.HttpStatus;
 
 public abstract class AbstractImageFilter implements ApiFilter {
 
+  private static final String LIVE_EVENT_TYPE = "http://www.ft.com/ontology/content/LiveEvent";
+
   protected void applyFilter(String jsonProperty, FieldModifier modifier, Map content) {
     modifier.operation(jsonProperty, content);
     Object mainImageSet = content.get(MAIN_IMAGE);
-    if (mainImageSet instanceof Map) {
+
+    String contentType = "";
+    if (content.containsKey(CONTENT_TYPE)) {
+      contentType = content.get(CONTENT_TYPE).toString();
+    }
+
+    if (mainImageSet instanceof Map && !contentType.equals(LIVE_EVENT_TYPE)) {
       Map mainImageSetAsMap = (Map) mainImageSet;
       if (mainImageSetAsMap.size() > 1) {
         try {
