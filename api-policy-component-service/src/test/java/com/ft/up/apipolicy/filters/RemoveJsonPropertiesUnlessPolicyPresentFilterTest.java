@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collections;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
@@ -40,7 +41,10 @@ public class RemoveJsonPropertiesUnlessPolicyPresentFilterTest {
   private final RemoveJsonPropertiesUnlessPolicyPresentFilter
       removeJsonPropertyUnlessPolicyPresentFilter =
           new RemoveJsonPropertiesUnlessPolicyPresentFilter(
-              jsonConverter, INCLUDE_LAST_MODIFIED_DATE, "lastModified", "comments");
+              jsonConverter,
+              Collections.singleton(INCLUDE_LAST_MODIFIED_DATE),
+              "lastModified",
+              "comments");
 
   private static byte[] readFileBytes(final String path) {
     try {

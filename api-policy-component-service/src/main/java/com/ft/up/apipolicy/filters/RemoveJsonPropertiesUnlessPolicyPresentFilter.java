@@ -4,21 +4,22 @@ import com.ft.up.apipolicy.JsonConverter;
 import com.ft.up.apipolicy.configuration.Policy;
 import com.ft.up.apipolicy.pipeline.MutableRequest;
 import java.util.Map;
+import java.util.Set;
 
 public class RemoveJsonPropertiesUnlessPolicyPresentFilter extends SuppressJsonPropertiesFilter {
 
-  private final Policy policy;
+  private final Set<Policy> policies;
 
   public RemoveJsonPropertiesUnlessPolicyPresentFilter(
-      final JsonConverter jsonConverter, final Policy policy, final String... jsonProperties) {
+      JsonConverter jsonConverter, Set<Policy> policies, String... jsonProperties) {
     super(jsonConverter, jsonProperties);
-    this.policy = policy;
+    this.policies = policies;
   }
 
   @Override
   protected boolean shouldPropertyFilteredOut(
       final String jsonProperty, final MutableRequest request, Map content) {
-    return !request.policyIs(policy)
+    return policies.stream().noneMatch(request::policyIs)
         && super.shouldPropertyFilteredOut(jsonProperty, request, content);
   }
 }
