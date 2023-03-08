@@ -8,6 +8,7 @@ import com.ft.up.apipolicy.filters.*;
 import com.ft.up.apipolicy.pipeline.ApiFilter;
 import com.ft.up.apipolicy.transformer.BodyProcessingFieldTransformer;
 import com.ft.up.apipolicy.transformer.BodyProcessingFieldTransformerFactory;
+import com.google.common.collect.Sets;
 import io.dropwizard.setup.Environment;
 import java.util.Collections;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -131,7 +132,7 @@ public class ApiFilters {
     contentPackageFilter =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
             jsonTweaker,
-            Collections.singleton(INTERNAL_UNSTABLE),
+            Sets.newHashSet(INCLUDE_RELATIONS, INTERNAL_UNSTABLE),
             CONTENT_PACKAGE_CONTAINS_JSON_PROPERTY,
             CONTENT_PACKAGE_CONTAINED_IN_JSON_PROPERTY);
     unrolledContentFilter = new UnrolledContentFilter(INCLUDE_RICH_CONTENT, EXPAND_RICH_CONTENT);
