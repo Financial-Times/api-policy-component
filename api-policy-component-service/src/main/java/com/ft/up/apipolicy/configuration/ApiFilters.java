@@ -8,7 +8,9 @@ import com.ft.up.apipolicy.filters.*;
 import com.ft.up.apipolicy.pipeline.ApiFilter;
 import com.ft.up.apipolicy.transformer.BodyProcessingFieldTransformer;
 import com.ft.up.apipolicy.transformer.BodyProcessingFieldTransformerFactory;
+import com.google.common.collect.Sets;
 import io.dropwizard.setup.Environment;
+import java.util.Collections;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -71,36 +73,41 @@ public class ApiFilters {
 
     mainImageFilter =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
-            jsonTweaker, INCLUDE_RICH_CONTENT, MAIN_IMAGE_JSON_PROPERTY);
+            jsonTweaker, Collections.singleton(INCLUDE_RICH_CONTENT), MAIN_IMAGE_JSON_PROPERTY);
     identifiersFilter =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
-            jsonTweaker, INCLUDE_IDENTIFIERS, IDENTIFIERS_JSON_PROPERTY);
+            jsonTweaker, Collections.singleton(INCLUDE_IDENTIFIERS), IDENTIFIERS_JSON_PROPERTY);
     alternativeTitlesFilter =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
-            jsonTweaker, INTERNAL_UNSTABLE, ALT_TITLES_JSON_PROPERTY);
+            jsonTweaker, Collections.singleton(INTERNAL_UNSTABLE), ALT_TITLES_JSON_PROPERTY);
     alternativeImagesFilter =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
-            jsonTweaker, INTERNAL_UNSTABLE, ALT_IMAGES_JSON_PROPERTY);
+            jsonTweaker, Collections.singleton(INTERNAL_UNSTABLE), ALT_IMAGES_JSON_PROPERTY);
     alternativeStandfirstsFilter =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
-            jsonTweaker, INTERNAL_UNSTABLE, ALT_STANDFIRST_JSON_PROPERTY);
+            jsonTweaker, Collections.singleton(INTERNAL_UNSTABLE), ALT_STANDFIRST_JSON_PROPERTY);
     stripCommentsFields =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
-            jsonTweaker, INCLUDE_COMMENTS, COMMENTS_JSON_PROPERTY);
+            jsonTweaker, Collections.singleton(INCLUDE_COMMENTS), COMMENTS_JSON_PROPERTY);
     removeCommentsFieldRegardlessOfPolicy =
         new SuppressJsonPropertiesFilter(jsonTweaker, COMMENTS_JSON_PROPERTY);
     stripProvenance =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
-            jsonTweaker, INCLUDE_PROVENANCE, PROVENANCE_JSON_PROPERTY, MASTER_SOURCE_JSON_PROPERTY);
+            jsonTweaker,
+            Collections.singleton(INCLUDE_PROVENANCE),
+            PROVENANCE_JSON_PROPERTY,
+            MASTER_SOURCE_JSON_PROPERTY);
     stripLastModifiedDate =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
-            jsonTweaker, INCLUDE_LAST_MODIFIED_DATE, LAST_MODIFIED_JSON_PROPERTY);
+            jsonTweaker,
+            Collections.singleton(INCLUDE_LAST_MODIFIED_DATE),
+            LAST_MODIFIED_JSON_PROPERTY);
     stripLite =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
-            jsonTweaker, INCLUDE_LITE, LITE_JSON_PROPERTY);
+            jsonTweaker, Collections.singleton(INCLUDE_LITE), LITE_JSON_PROPERTY);
     stripOpeningXml =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
-            jsonTweaker, INTERNAL_UNSTABLE, OPENING_XML_JSON_PROPERTY);
+            jsonTweaker, Collections.singleton(INTERNAL_UNSTABLE), OPENING_XML_JSON_PROPERTY);
     suppressMarkup =
         new SuppressRichContentMarkupFilter(jsonTweaker, getBodyProcessingFieldTransformer());
     webUrlAdder =
@@ -114,7 +121,7 @@ public class ApiFilters {
     contentNotificationsFilter = new NotificationsTypeFilter(jsonTweaker);
     accessLevelPropertyFilter =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
-            jsonTweaker, INTERNAL_UNSTABLE, ACCESS_LEVEL_JSON_PROPERTY);
+            jsonTweaker, Collections.singleton(INTERNAL_UNSTABLE), ACCESS_LEVEL_JSON_PROPERTY);
     removeAccessFieldRegardlessOfPolicy =
         new SuppressJsonPropertiesFilter(jsonTweaker, ACCESS_LEVEL_JSON_PROPERTY);
     accessLevelHeaderFilter =
@@ -125,16 +132,16 @@ public class ApiFilters {
     contentPackageFilter =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
             jsonTweaker,
-            INTERNAL_UNSTABLE,
+            Sets.newHashSet(INCLUDE_RELATIONS, INTERNAL_UNSTABLE),
             CONTENT_PACKAGE_CONTAINS_JSON_PROPERTY,
             CONTENT_PACKAGE_CONTAINED_IN_JSON_PROPERTY);
     unrolledContentFilter = new UnrolledContentFilter(INCLUDE_RICH_CONTENT, EXPAND_RICH_CONTENT);
     editorialDeskFilter =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
-            jsonTweaker, INTERNAL_ANALYTICS, EDITORIAL_DESK_JSON_PROPERTY);
+            jsonTweaker, Collections.singleton(INTERNAL_ANALYTICS), EDITORIAL_DESK_JSON_PROPERTY);
     internalAnalyticsTagsFilter =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
-            jsonTweaker, INTERNAL_ANALYTICS, INTERNAL_ANALYTICS_TAG_FILTER);
+            jsonTweaker, Collections.singleton(INTERNAL_ANALYTICS), INTERNAL_ANALYTICS_TAG_FILTER);
   }
 
   public ApiFilter notificationsFilter() {
