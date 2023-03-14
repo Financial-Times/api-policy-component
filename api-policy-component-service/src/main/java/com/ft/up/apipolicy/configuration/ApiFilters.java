@@ -259,6 +259,10 @@ public class ApiFilters {
     };
   }
 
+  public ApiFilter[] contentNotificationsHistoryFilters() {
+    return new ApiFilter[] {new PolicyBasedJsonFilter(getNotificationsFilters(true))};
+  }
+
   public ApiFilter[] contentIdentifiersFilters() {
     return new ApiFilter[] {
       canBeDistributedAccessFilter,

@@ -145,6 +145,13 @@ public class ApiPolicyApplication extends Application<ApiPolicyConfiguration> {
         createEndpoint(
             environment,
             configuration,
+            "^/content/notifications/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}(/annotations)?",
+            "notifications",
+            apiFilters.contentNotificationsHistoryFilters()));
+    knownWildcardEndpoints.add(
+        createEndpoint(
+            environment,
+            configuration,
             "^/content/notifications.*",
             "notifications",
             apiFilters.contentNotificationsFilters()));
