@@ -186,7 +186,7 @@ public class NotificationsTypeFilterTest {
 
     String responseBody =
         "{ \"requestUrl\":"
-            + " \"http://example.org/content/notifications?since=2016-07-23T00:00:00.000Z&type=article&type=mediaResource&monitor=false\","
+            + " \"http://example.org/content/notifications?since=2016-07-23T00:00:00.000Z&type=article&type=mediaResource&monitor=false&hideCreate=true\","
             + " \"links\": [] }";
     String strippedBody =
         "{\"requestUrl\":\"http://example.org/content/notifications?since=2016-07-23T00:00:00.000Z\",\"links\":[]}";
