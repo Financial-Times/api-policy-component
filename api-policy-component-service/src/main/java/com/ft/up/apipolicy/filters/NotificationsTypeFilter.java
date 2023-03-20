@@ -97,6 +97,7 @@ public class NotificationsTypeFilter implements ApiFilter {
     UriBuilder uriBuilder = UriBuilder.fromUri((String) content.get(key));
     uriBuilder.replaceQueryParam(TYPE_KEY, null);
     uriBuilder.replaceQueryParam(MONITOR_KEY, null);
+    uriBuilder.replaceQueryParam(HIDE_CREATE_EVENTS_KEY, null);
     content.put(key, uriBuilder.build());
   }
 
