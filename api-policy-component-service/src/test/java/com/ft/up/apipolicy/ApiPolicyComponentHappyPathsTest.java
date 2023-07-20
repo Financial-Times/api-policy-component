@@ -123,6 +123,7 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
   private static final String LISTS_BASE_PATH = "/lists";
   private static final String LISTS_PATH = LISTS_BASE_PATH + "/" + LIST_UUID;
   private static final String PAGES_BASE_PATH = "/pages";
+  private static final String ANNOTATIONS_NOTIFICATION_BASE_PATH = "/annotations";
   private static final String PARAM_VALIDATE_LINKS = "validateLinkedResources";
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -286,6 +287,16 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
           + "\"publishReference\": \"tid_vcxz08642\" "
           + "}";
 
+  private static final String ANNOTATION_NOTIFICATION_JSON =
+      "{"
+          + "\"type\": \"http://www.ft.com/thing/ThingChangeType/ANNOTATIONS_UPDATE\","
+          + "\"notificationDate\": \"2023-07-12T10:39:34.653Z\","
+          + "\"id\": \"http://www.ft.com/thing/f38ab096-f488-46b4-9650-c3dcc5af2194\","
+          + "\"apiUrl\": \"https://api-t.ft.com/annotations/f38ab096-f488-46b4-9650-c3dcc5af2194\","
+          + "\"publishReference\": \"tid_cct_f38ab096-f488-46b4-9650-c3dcc5af2194_1689158364449\","
+          + "\"lastModified\": \"2023-07-12T10:39:24.65Z\""
+          + "}";
+
   private static final String PAGE_NOTIFICATION_JSON =
       "{"
           + "\"id\": \"http://api.ft.com/things/9125b25e-8305-11e5-8317-6f9588949b86\", "
@@ -392,6 +403,9 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
 
   private static final String PAGE_NOTIFICATIONS_JSON =
       String.format(NOTIFICATIONS_RESPONSE_TEMPLATE, "", PAGE_NOTIFICATION_JSON);
+
+  private static final String ANNOTATION_NOTIFICATIONS_JSON =
+      String.format(NOTIFICATIONS_RESPONSE_TEMPLATE, "", ANNOTATION_NOTIFICATION_JSON);
 
   @Rule public final WireMockClassRule wireMockForVarnish = WIRE_MOCK_1;
 
@@ -1220,6 +1234,36 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
       assertThat(response.getStatus(), is(200));
       assertThat(entity, not(containsJsonProperty("lastModified")));
       assertThat(entity, not(containsJsonProperty("publishReference")));
+    } finally {
+      response.close();
+    }
+  }
+
+  @Test
+  public void shouldForwardAnnotationsNotificationsCall() {
+    givenEverythingSetup();
+
+    final URI uri = fromFacade(ANNOTATIONS_NOTIFICATION_BASE_PATH + "/notifications").build();
+    stubFor(
+        get(urlPathEqualTo(ANNOTATIONS_NOTIFICATION_BASE_PATH + "/notifications"))
+            .willReturn(
+                aResponse()
+                    .withBody(ANNOTATION_NOTIFICATIONS_JSON)
+                    .withHeader("Content-Type", MediaType.APPLICATION_JSON)
+                    .withStatus(200)));
+    final Response response = client.target(uri).request().get();
+    try {
+      verify(
+          getRequestedFor(urlPathMatching(ANNOTATIONS_NOTIFICATION_BASE_PATH + "/notifications")));
+      String entity = response.readEntity(String.class);
+
+      assertThat(response.getStatus(), is(200));
+      assertThat(entity, not(containsJsonProperty("type")));
+      assertThat(entity, not(containsJsonProperty("notificationDate")));
+      assertThat(entity, not(containsJsonProperty("id")));
+      assertThat(entity, not(containsJsonProperty("apiUrl")));
+      assertThat(entity, not(containsJsonProperty("publishReference")));
+      assertThat(entity, not(containsJsonProperty("lastModified")));
     } finally {
       response.close();
     }
