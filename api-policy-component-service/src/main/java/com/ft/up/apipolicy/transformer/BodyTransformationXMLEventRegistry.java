@@ -15,6 +15,8 @@ import java.util.Collections;
 public class BodyTransformationXMLEventRegistry extends XMLEventHandlerRegistry {
 
   private static final String IMAGE_SET_CLASS_URI = "http://www.ft.com/ontology/content/ImageSet";
+  private static final String CLIP_SET_CLASS_URI = "http://www.ft.com/ontology/content/ClipSet";
+
   private static final String MEDIA_RESOURCE_CLASS_URI =
       "http://www.ft.com/ontology/content/MediaResource";
   private static final String FT_CONTENT = "ft-content";
@@ -50,6 +52,10 @@ public class BodyTransformationXMLEventRegistry extends XMLEventHandlerRegistry 
     final XMLEventHandler removeImageSet =
         new StripElementIfSpecificAttributesXmlEventHandler(
             Collections.singletonMap("type", IMAGE_SET_CLASS_URI), removeMediaResource);
+    final XMLEventHandler removeClipSet =
+        new StripElementIfSpecificAttributesXmlEventHandler(
+            Collections.singletonMap("type", CLIP_SET_CLASS_URI), removeMediaResource);
     registerStartAndEndElementEventHandler(removeImageSet, FT_CONTENT);
+    registerStartAndEndElementEventHandler(removeClipSet, FT_CONTENT);
   }
 }
