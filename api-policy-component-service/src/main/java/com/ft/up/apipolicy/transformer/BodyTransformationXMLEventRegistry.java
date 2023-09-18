@@ -16,7 +16,7 @@ public class BodyTransformationXMLEventRegistry extends XMLEventHandlerRegistry 
 
   private static final String IMAGE_SET_CLASS_URI = "http://www.ft.com/ontology/content/ImageSet";
   private static final String CLIP_SET_CLASS_URI = "http://www.ft.com/ontology/content/ClipSet";
-
+  private static final String TYPE = "type";
   private static final String MEDIA_RESOURCE_CLASS_URI =
       "http://www.ft.com/ontology/content/MediaResource";
   private static final String FT_CONTENT = "ft-content";
@@ -52,12 +52,12 @@ public class BodyTransformationXMLEventRegistry extends XMLEventHandlerRegistry 
   private static XMLEventHandler getChainedXmlEventHandlers() {
     final XMLEventHandler removeMediaResource =
         new StripElementIfSpecificAttributesXmlEventHandler(
-            Collections.singletonMap("type", MEDIA_RESOURCE_CLASS_URI),
+            Collections.singletonMap(TYPE, MEDIA_RESOURCE_CLASS_URI),
             new RetainXMLEventHandler());
     final XMLEventHandler removeImageSet =
         new StripElementIfSpecificAttributesXmlEventHandler(
-            Collections.singletonMap("type", IMAGE_SET_CLASS_URI), removeMediaResource);
+            Collections.singletonMap(TYPE, IMAGE_SET_CLASS_URI), removeMediaResource);
     return new StripElementIfSpecificAttributesXmlEventHandler(
-        Collections.singletonMap("type", CLIP_SET_CLASS_URI), removeImageSet);
+        Collections.singletonMap(TYPE, CLIP_SET_CLASS_URI), removeImageSet);
   }
 }
