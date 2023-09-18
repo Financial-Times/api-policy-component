@@ -45,6 +45,11 @@ public class BodyTransformationXMLEventRegistry extends XMLEventHandlerRegistry 
             new RetainXMLEventHandler()),
         "a");
 
+    final XMLEventHandler chainedXmlEventHandlers = getChainedXmlEventHandlers();
+    registerStartAndEndElementEventHandler(chainedXmlEventHandlers, FT_CONTENT);
+  }
+
+  private static XMLEventHandler getChainedXmlEventHandlers() {
     final XMLEventHandler removeMediaResource =
         new StripElementIfSpecificAttributesXmlEventHandler(
             Collections.singletonMap("type", MEDIA_RESOURCE_CLASS_URI),
@@ -52,10 +57,7 @@ public class BodyTransformationXMLEventRegistry extends XMLEventHandlerRegistry 
     final XMLEventHandler removeImageSet =
         new StripElementIfSpecificAttributesXmlEventHandler(
             Collections.singletonMap("type", IMAGE_SET_CLASS_URI), removeMediaResource);
-    final XMLEventHandler removeClipSet =
-        new StripElementIfSpecificAttributesXmlEventHandler(
-            Collections.singletonMap("type", CLIP_SET_CLASS_URI), removeMediaResource);
-    registerStartAndEndElementEventHandler(removeImageSet, FT_CONTENT);
-    registerStartAndEndElementEventHandler(removeClipSet, FT_CONTENT);
+    return new StripElementIfSpecificAttributesXmlEventHandler(
+        Collections.singletonMap("type", CLIP_SET_CLASS_URI), removeImageSet);
   }
 }
