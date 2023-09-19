@@ -52,8 +52,7 @@ public class BodyTransformationXMLEventRegistry extends XMLEventHandlerRegistry 
   private static XMLEventHandler getChainedXmlEventHandlers() {
     final XMLEventHandler removeMediaResource =
         new StripElementIfSpecificAttributesXmlEventHandler(
-            Collections.singletonMap(TYPE, MEDIA_RESOURCE_CLASS_URI),
-            new RetainXMLEventHandler());
+            Collections.singletonMap(TYPE, MEDIA_RESOURCE_CLASS_URI), new RetainXMLEventHandler());
     final XMLEventHandler removeImageSet =
         new StripElementIfSpecificAttributesXmlEventHandler(
             Collections.singletonMap(TYPE, IMAGE_SET_CLASS_URI), removeMediaResource);
