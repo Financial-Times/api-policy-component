@@ -109,6 +109,16 @@ public class BodyProcessingFieldTransformerFactoryTest {
   }
 
   @Test
+  public void shouldRemoveClipSetAndStripOutSurroundingTag() {
+    String original =
+        "<body><p>He sheltered there.</p>\n<p><ft-content type=\"http://www.ft.com/ontology/content/ClipSet\" url=\"https://api.ft.com/content/a4456c3a-6a6a-11e4-8fca-00144feabdc0\">clipset</ft-content></p>\n<p>“I saw bodies everywhere.”</p>\n\n\n\n</body>";
+    String expected =
+        "<body><p>He sheltered there.</p>\n<p>“I saw bodies everywhere.”</p>\n\n\n\n</body>";
+
+    checkTransformation(original, expected);
+  }
+
+  @Test
   public void shouldRemoveInlineVideosAndStripOutSurroundingTag() {
     String original =
         "<body><p>He sheltered there.</p>\n<p><ft-content data-embedded=\"true\" type=\"http://www.ft.com/ontology/content/MediaResource\" url=\"http://api.ft.com/content/807a95c5-87c3-3aee-9239-387f6dc32a60\"></ft-content></p>\n<p>“I saw bodies everywhere.”</p>\n\n\n\n</body>";
@@ -127,7 +137,7 @@ public class BodyProcessingFieldTransformerFactoryTest {
   }
 
   @Test
-  public void testShouldRemoveInlineExternalImages() throws Exception {
+  public void testShouldRemoveInlineExternalImages() {
     String original =
         "<body><p>He sheltered there.<img alt=\"Saloua Raouda Choucair's ‘Composition'\" height=\"445\" src=\"http://im.ft-static.com/content/images/7784185e-a888-11e2-8e5d-00144feabdc0.img\" width=\"600\"/></p>\n\n\n\n</body>";
     String expected = "<body><p>He sheltered there.</p>\n\n\n\n</body>";
