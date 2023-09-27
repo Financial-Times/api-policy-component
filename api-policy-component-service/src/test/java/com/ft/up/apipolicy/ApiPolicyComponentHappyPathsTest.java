@@ -191,6 +191,7 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
           + "\"brands\": [ ],\n"
           + "\"annotations\": [ ], \n"
           + "\"accessLevel\": \"subscribed\",\n"
+          + "\"isTestContent\": \"true\",\n"
           + "\"contains\": [\"http://api.ft.com/things/111192a7-1f0c-11e4-b0cb-b2227cce2b54\"],\n"
           + "\"containedIn\": [\"http://api.ft.com/things/4c7592a7-1f0c-11e4-b0cb-b2227cce2b54\"]\n"
           + "}";
@@ -924,6 +925,7 @@ public class ApiPolicyComponentHappyPathsTest extends AbstractApiComponentTest {
       String jsonPayload = response.readEntity(String.class);
       assertThat(jsonPayload, containsJsonProperty("containedIn"));
       assertThat(jsonPayload, containsJsonProperty("contains"));
+      assertThat(jsonPayload, containsJsonProperty("isTestContent"));
     } finally {
       response.close();
     }

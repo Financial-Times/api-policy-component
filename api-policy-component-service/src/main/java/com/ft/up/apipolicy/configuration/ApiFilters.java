@@ -20,7 +20,7 @@ public class ApiFilters {
   private static final String IDENTIFIERS_JSON_PROPERTY = "identifiers";
   private static final String ALT_TITLES_JSON_PROPERTY = "alternativeTitles";
   private static final String ALT_IMAGES_JSON_PROPERTY = "alternativeImages";
-  private static final String IS_TEST_CONTENT_JSON_PROPERTY = "alternativeImages";
+  private static final String IS_TEST_CONTENT_JSON_PROPERTY = "isTestContent";
   private static final String ALT_STANDFIRST_JSON_PROPERTY = "alternativeStandfirsts";
   private static final String COMMENTS_JSON_PROPERTY = "comments";
   private static final String PROVENANCE_JSON_PROPERTY = "publishReference";

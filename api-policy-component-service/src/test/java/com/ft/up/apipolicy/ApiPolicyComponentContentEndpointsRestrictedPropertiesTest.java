@@ -74,6 +74,7 @@ public class ApiPolicyComponentContentEndpointsRestrictedPropertiesTest
           + "\"alternativeTitles\" : {},\n"
           + "\"alternativeImages\" : {},\n"
           + "\"alternativeStandfirsts\" : {},\n"
+          + "\"isTestContent\": \"true\",\n"
           + "\"lastModified\": \"2015-12-13T17:04:54.636Z\",\n"
           + "\"publishReference\": \"tid_junit_publishref\",\n"
           + "\"identifiers\": [{\n"
@@ -218,6 +219,17 @@ public class ApiPolicyComponentContentEndpointsRestrictedPropertiesTest
           },
           {
             "openingXML",
+            Policy.INTERNAL_UNSTABLE,
+            true,
+            true,
+            true,
+            true,
+            CONTENT_JSON,
+            ENRICHED_CONTENT_JSON,
+            INTERNAL_CONTENT_JSON
+          },
+          {
+            "isTestContent",
             Policy.INTERNAL_UNSTABLE,
             true,
             true,
@@ -398,7 +410,7 @@ public class ApiPolicyComponentContentEndpointsRestrictedPropertiesTest
   }
 
   @Test
-  public void shouldAllowPropertyForContentWhenPolicyIsPresent() throws Exception {
+  public void shouldAllowPropertyForContentWhenPolicyIsPresent() {
     final URI uri = fromFacade(CONTENT_PATH).build();
     response =
         client
@@ -411,7 +423,7 @@ public class ApiPolicyComponentContentEndpointsRestrictedPropertiesTest
   }
 
   @Test
-  public void shouldAllowPropertyForContentPreviewWhenPolicyIsPresent() throws Exception {
+  public void shouldAllowPropertyForContentPreviewWhenPolicyIsPresent() {
     final URI uri = fromFacade(CONTENT_PREVIEW_PATH).build();
     response =
         client
@@ -424,7 +436,7 @@ public class ApiPolicyComponentContentEndpointsRestrictedPropertiesTest
   }
 
   @Test
-  public void shouldAllowPropertyForEnrichedContentWhenPolicyIsPresent() throws Exception {
+  public void shouldAllowPropertyForEnrichedContentWhenPolicyIsPresent() {
     final URI uri = fromFacade(ENRICHED_CONTENT_PATH).build();
     response =
         client
@@ -437,7 +449,7 @@ public class ApiPolicyComponentContentEndpointsRestrictedPropertiesTest
   }
 
   @Test
-  public void shouldAllowPropertyForInternalContentWhenPolicyIsPresent() throws Exception {
+  public void shouldAllowPropertyForInternalContentWhenPolicyIsPresent() {
     final URI uri = fromFacade(INTERNAL_CONTENT_PATH).build();
     response =
         client
@@ -450,7 +462,7 @@ public class ApiPolicyComponentContentEndpointsRestrictedPropertiesTest
   }
 
   @Test
-  public void shouldRemovePropertyForContentWhenPolicyIsNotPresent() throws Exception {
+  public void shouldRemovePropertyForContentWhenPolicyIsNotPresent() {
     final URI uri = fromFacade(CONTENT_PATH).build();
     response = client.target(uri).request().get();
 
@@ -458,7 +470,7 @@ public class ApiPolicyComponentContentEndpointsRestrictedPropertiesTest
   }
 
   @Test
-  public void shouldRemovePropertyForContentPreviewWhenPolicyIsNotPresent() throws Exception {
+  public void shouldRemovePropertyForContentPreviewWhenPolicyIsNotPresent() {
     final URI uri = fromFacade(CONTENT_PREVIEW_PATH).build();
     response = client.target(uri).request().get();
 
@@ -466,7 +478,7 @@ public class ApiPolicyComponentContentEndpointsRestrictedPropertiesTest
   }
 
   @Test
-  public void shouldRemovePropertyForEnrichedContentWhenPolicyIsNotPresent() throws Exception {
+  public void shouldRemovePropertyForEnrichedContentWhenPolicyIsNotPresent() {
     final URI uri = fromFacade(ENRICHED_CONTENT_PATH).build();
     response = client.target(uri).request().get();
 
@@ -474,7 +486,7 @@ public class ApiPolicyComponentContentEndpointsRestrictedPropertiesTest
   }
 
   @Test
-  public void shouldRemovePropertyForInternalContentWhenPolicyIsNotPresent() throws Exception {
+  public void shouldRemovePropertyForInternalContentWhenPolicyIsNotPresent() {
     final URI uri = fromFacade(INTERNAL_CONTENT_PATH).build();
     response = client.target(uri).request().get();
 
