@@ -20,6 +20,7 @@ public class ApiFilters {
   private static final String IDENTIFIERS_JSON_PROPERTY = "identifiers";
   private static final String ALT_TITLES_JSON_PROPERTY = "alternativeTitles";
   private static final String ALT_IMAGES_JSON_PROPERTY = "alternativeImages";
+  private static final String IS_TEST_CONTENT_JSON_PROPERTY = "isTestContent";
   private static final String ALT_STANDFIRST_JSON_PROPERTY = "alternativeStandfirsts";
   private static final String COMMENTS_JSON_PROPERTY = "comments";
   private static final String PROVENANCE_JSON_PROPERTY = "publishReference";
@@ -38,6 +39,7 @@ public class ApiFilters {
   private ApiFilter identifiersFilter;
   private ApiFilter alternativeTitlesFilter;
   private ApiFilter alternativeImagesFilter;
+  private ApiFilter isTestContentFilter;
   private ApiFilter alternativeStandfirstsFilter;
   private ApiFilter stripCommentsFields;
   private ApiFilter removeCommentsFieldRegardlessOfPolicy;
@@ -83,6 +85,9 @@ public class ApiFilters {
     alternativeImagesFilter =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
             jsonTweaker, Collections.singleton(INTERNAL_UNSTABLE), ALT_IMAGES_JSON_PROPERTY);
+    isTestContentFilter =
+        new RemoveJsonPropertiesUnlessPolicyPresentFilter(
+            jsonTweaker, Collections.singleton(INTERNAL_UNSTABLE), IS_TEST_CONTENT_JSON_PROPERTY);
     alternativeStandfirstsFilter =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
             jsonTweaker, Collections.singleton(INTERNAL_UNSTABLE), ALT_STANDFIRST_JSON_PROPERTY);
@@ -187,6 +192,7 @@ public class ApiFilters {
       mainImageFilter,
       alternativeTitlesFilter,
       alternativeImagesFilter,
+      isTestContentFilter,
       alternativeStandfirstsFilter,
       stripCommentsFields,
       stripProvenance,
@@ -212,6 +218,7 @@ public class ApiFilters {
       mainImageFilter,
       alternativeTitlesFilter,
       alternativeImagesFilter,
+      isTestContentFilter,
       alternativeStandfirstsFilter,
       stripCommentsFields,
       stripProvenance,
@@ -237,6 +244,7 @@ public class ApiFilters {
       mainImageFilter,
       alternativeTitlesFilter,
       alternativeImagesFilter,
+      isTestContentFilter,
       alternativeStandfirstsFilter,
       stripCommentsFields,
       stripProvenance,
@@ -276,6 +284,7 @@ public class ApiFilters {
       mainImageFilter,
       alternativeTitlesFilter,
       alternativeImagesFilter,
+      isTestContentFilter,
       alternativeStandfirstsFilter,
       removeCommentsFieldRegardlessOfPolicy,
       stripProvenance,
@@ -298,6 +307,7 @@ public class ApiFilters {
       mainImageFilter,
       alternativeTitlesFilter,
       alternativeImagesFilter,
+      isTestContentFilter,
       alternativeStandfirstsFilter,
       stripCommentsFields,
       stripProvenance,
