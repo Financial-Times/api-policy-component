@@ -19,7 +19,9 @@ public class UnrolledContentFilter implements ApiFilter {
   @Override
   public MutableResponse processRequest(MutableRequest request, HttpPipelineChain chain) {
     if (policies.length > 0 && shouldAddParameter(request)) {
-      request.getQueryParameters().putSingle(UNROLL_CONTENT, Boolean.TRUE.toString());
+      if (!request.getQueryParameters().containsKey(UNROLL_CONTENT)) {
+        request.getQueryParameters().putSingle(UNROLL_CONTENT, Boolean.TRUE.toString());
+      }
     }
     return chain.callNextFilter(request);
   }
