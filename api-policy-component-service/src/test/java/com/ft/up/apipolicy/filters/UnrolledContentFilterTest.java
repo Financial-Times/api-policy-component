@@ -21,6 +21,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class UnrolledContentFilterTest {
 
+  private static final String UNROLL_CONTENT = "unrollContent";
+
   private UnrolledContentFilter filter;
 
   @Mock private MutableRequest request;
@@ -30,6 +32,24 @@ public class UnrolledContentFilterTest {
   @Before
   public void setUp() {
     filter = new UnrolledContentFilter(INCLUDE_RICH_CONTENT, EXPAND_RICH_CONTENT);
+  }
+
+  @Test
+  public void thatRequestParameterCheckUnrollContentWhenRichContentPolicy() {
+    @SuppressWarnings("unchecked")
+    MultivaluedMap<String, String> params = mock(MultivaluedMap.class);
+    params.putSingle(UNROLL_CONTENT, Boolean.TRUE.toString());
+    when(request.getQueryParameters()).thenReturn(params);
+
+    when(request.getQueryParameters().containsKey(UNROLL_CONTENT)).thenReturn(true);
+    when(request.policyIs(EXPAND_RICH_CONTENT)).thenReturn(true);
+    when(request.policyIs(INCLUDE_RICH_CONTENT)).thenReturn(true);
+
+    filter.processRequest(request, chain);
+
+    InOrder inOrder = inOrder(chain, params);
+    inOrder.verify(params).putSingle("unrollContent", "true");
+    inOrder.verify(chain).callNextFilter(request);
   }
 
   @Test
