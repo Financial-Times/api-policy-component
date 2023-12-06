@@ -37,6 +37,8 @@ public class CheckPublicationPolicy implements ApiFilter {
       List<String> publication = convertObjectToStringList(content.get(PUBLICATION));
       if (!checkAccess(pubPolicies, publication)) {
         response.setStatus(403);
+        content.clear();
+        jsonConverter.replaceEntity(response, content);
       }
     }
     return response;
