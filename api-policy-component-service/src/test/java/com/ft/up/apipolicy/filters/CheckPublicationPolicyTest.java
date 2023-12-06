@@ -29,7 +29,7 @@ public class CheckPublicationPolicyTest {
   @Test
   public void ShouldReturnOK() {
     String entity =
-        "{ \"type\":\"http://www.ft.com/ontology/content/Article\", \"bodyXML\": \"<body>something here</body>\",\"publication\":[\"8e6c705e-1132-42a2-8db0-c295e29e8658\",\"88fdde6c-2aa4-4f78-af02-9f680097cfd6\"] }";
+        "{ \"type\":\"http://www.ft.com/ontology/content/Article\", \"bodyXML\": \"<body>something here</body>\",\"publication\":[\"http://www.ft.com/thing/8e6c705e-1132-42a2-8db0-c295e29e8658\",\"http://www.ft.com/thing/88fdde6c-2aa4-4f78-af02-9f680097cfd6\"] }";
     MutableResponse validResponse =
         new MutableResponse(new MultivaluedHashMap<>(), entity.getBytes());
     validResponse.setStatus(200);
@@ -47,7 +47,7 @@ public class CheckPublicationPolicyTest {
   @Test
   public void ShouldReturn403() {
     String entity =
-        "{ \"type\":\"http://www.ft.com/ontology/content/Article\", \"bodyXML\": \"<body>something here</body>\",\"publication\":[\"88fdde6c-2aa4-4f78-af02-9f680097cfd6\"] }";
+        "{ \"type\":\"http://www.ft.com/ontology/content/Article\", \"bodyXML\": \"<body>something here</body>\",\"publication\":[\"http://www.ft.com/thing/88fdde6c-2aa4-4f78-af02-9f680097cfd6\"] }";
     MutableResponse validResponse =
         new MutableResponse(new MultivaluedHashMap<>(), entity.getBytes());
     validResponse.setStatus(200);
@@ -65,7 +65,7 @@ public class CheckPublicationPolicyTest {
   @Test
   public void ShouldReturnOkWithNoPublicationReadPolicyFtPink() {
     String entity =
-        "{ \"type\":\"http://www.ft.com/ontology/content/Article\", \"bodyXML\": \"<body>something here</body>\",\"publication\":[\"88fdde6c-2aa4-4f78-af02-9f680097cfd6\"] }";
+        "{ \"type\":\"http://www.ft.com/ontology/content/Article\", \"bodyXML\": \"<body>something here</body>\",\"publication\":[\"http://www.ft.com/thing/88fdde6c-2aa4-4f78-af02-9f680097cfd6\"] }";
     MutableResponse validResponse =
         new MutableResponse(new MultivaluedHashMap<>(), entity.getBytes());
     validResponse.setStatus(200);
@@ -81,7 +81,7 @@ public class CheckPublicationPolicyTest {
   @Test
   public void ShouldDeniedAccessNoPublicationPolicyNonPinkFt() {
     String entity =
-        "{ \"type\":\"http://www.ft.com/ontology/content/Article\", \"bodyXML\": \"<body>something here</body>\",\"publication\":[\"8e6c705e-1132-42a2-8db0-c295e29e8658\"] }";
+        "{ \"type\":\"http://www.ft.com/ontology/content/Article\", \"bodyXML\": \"<body>something here</body>\",\"publication\":[\"http://www.ft.com/thing/8e6c705e-1132-42a2-8db0-c295e29e8658\"] }";
     MutableResponse validResponse =
         new MutableResponse(new MultivaluedHashMap<>(), entity.getBytes());
     validResponse.setStatus(200);
