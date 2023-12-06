@@ -7,16 +7,12 @@ import com.ft.up.apipolicy.pipeline.ApiFilter;
 import com.ft.up.apipolicy.pipeline.HttpPipelineChain;
 import com.ft.up.apipolicy.pipeline.MutableRequest;
 import com.ft.up.apipolicy.pipeline.MutableResponse;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 public class CheckPublicationPolicy implements ApiFilter {
@@ -36,24 +32,24 @@ public class CheckPublicationPolicy implements ApiFilter {
     final MutableResponse response = chain.callNextFilter(request);
     if (isEligibleForPublicationPolicyCheck(response)) {
       final Map<String, Object> content = extractContent(response);
-      MultivaluedMap<String, Object> httpHeaders = response.getHeaders();
-      Set<String> policies = getPublicationPolicies(httpHeaders.get(POLICY));
+      List<String> policies = new ArrayList<>(request.getPolicies());
+      List<String> pubPolicies = getPublicationPolicies(policies);
       List<String> publication = convertObjectToStringList(content.get(PUBLICATION));
-      if (!checkAccess(policies, publication)) {
+      if (!checkAccess(pubPolicies, publication)) {
         response.setStatus(403);
       }
     }
     return response;
   }
 
-  private static Boolean checkAccess(Set<String> policies, List<String> publication) {
+  private static Boolean checkAccess(List<String> policies, List<String> publication) {
     for (String p : policies) {
       if (publication.contains(p)) {
         return true;
       }
     }
     // No publication related X-Policy or publication field we consider this legacy ft request
-    return policies.isEmpty() && publication.contains(PINK_FT) || publication.isEmpty();
+    return policies.isEmpty() && publication.contains(PINK_FT);
   }
 
   private static List<String> convertObjectToStringList(Object obj) {
@@ -65,21 +61,11 @@ public class CheckPublicationPolicy implements ApiFilter {
     }
   }
 
-  private Set<String> getPublicationPolicies(List<Object> headerPolicies) {
-    Set<String> policies = new LinkedHashSet<>();
-    if (headerPolicies != null) {
-      headerPolicies.forEach(
-          p -> {
-            String x = (String) p;
-            List<String> pblcs = new LinkedList<>(Arrays.asList(x.split("[ ,]")));
-            pblcs.removeIf(n -> !n.contains(PUBLICATION_PREFIX));
-            policies.addAll(
-                pblcs.stream()
-                    .map(var -> var.replaceFirst(PUBLICATION_PREFIX, ""))
-                    .collect(Collectors.toList()));
-          });
-    }
-    return policies;
+  private List<String> getPublicationPolicies(List<String> policies) {
+    policies.removeIf(n -> !n.contains(PUBLICATION_PREFIX));
+    return policies.stream()
+        .map(var -> var.replaceFirst(PUBLICATION_PREFIX, ""))
+        .collect(Collectors.toList());
   }
 
   private boolean isEligibleForPublicationPolicyCheck(final MutableResponse response) {
