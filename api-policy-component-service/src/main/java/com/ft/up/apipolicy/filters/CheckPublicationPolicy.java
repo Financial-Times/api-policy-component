@@ -49,7 +49,7 @@ public class CheckPublicationPolicy implements ApiFilter {
       }
     }
     // No publication related X-Policy or publication field we consider this legacy ft request
-    return policies.isEmpty() && publication.contains(PINK_FT);
+    return policies.isEmpty() &&  (publication.contains(PINK_FT) || publication.isEmpty());
   }
 
   private static List<String> convertObjectToStringList(Object obj) {
