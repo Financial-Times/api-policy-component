@@ -38,6 +38,7 @@ public class CheckPublicationPolicy implements ApiFilter {
       if (!checkAccess(pubPolicies, publication)) {
         response.setStatus(403);
         content.clear();
+        content.put("error", "access denied");
         jsonConverter.replaceEntity(response, content);
       }
     }
