@@ -21,6 +21,8 @@ public class CheckPublicationPolicy implements ApiFilter {
   private static final String PUBLICATION_PREFIX = "PBLC_READ_";
   private static final String PINK_FT = "88fdde6c-2aa4-4f78-af02-9f680097cfd6";
   private static final String THING = "http://www.ft.com/thing/";
+  private static final String ERROR_FIELD = "error";
+  private static final String ERROR_MESSAGE = "access denied";
   private final JsonConverter jsonConverter;
 
   public CheckPublicationPolicy(JsonConverter jsonConverter) {
@@ -36,12 +38,18 @@ public class CheckPublicationPolicy implements ApiFilter {
       List<String> pubPolicies = getPublicationPolicies(policies);
       List<String> publication = convertObjectToStringList(content.get(PUBLICATION));
       if (!checkAccess(pubPolicies, publication)) {
-        response.setStatus(403);
-        content.clear();
-        content.put("error", "access denied");
-        jsonConverter.replaceEntity(response, content);
+        return createResponseWithErrorMessage(response, content);
       }
     }
+    return response;
+  }
+
+  private MutableResponse createResponseWithErrorMessage(
+      final MutableResponse response, final Map<String, Object> content) {
+    response.setStatus(403);
+    content.clear();
+    content.put(ERROR_FIELD, ERROR_MESSAGE);
+    jsonConverter.replaceEntity(response, content);
     return response;
   }
 
@@ -64,9 +72,9 @@ public class CheckPublicationPolicy implements ApiFilter {
 
   private List<String> getPublicationPolicies(List<String> policies) {
     return policies.stream()
-            .filter(p -> p.contains(PUBLICATION_PREFIX))
-            .map(p -> p.replaceFirst(PUBLICATION_PREFIX, ""))
-            .collect(Collectors.toList());
+        .filter(p -> p.contains(PUBLICATION_PREFIX))
+        .map(p -> p.replaceFirst(PUBLICATION_PREFIX, ""))
+        .collect(Collectors.toList());
   }
 
   private boolean isEligibleForPublicationPolicyCheck(final MutableResponse response) {
