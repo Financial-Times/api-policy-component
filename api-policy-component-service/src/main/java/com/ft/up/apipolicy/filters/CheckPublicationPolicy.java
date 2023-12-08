@@ -46,10 +46,8 @@ public class CheckPublicationPolicy implements ApiFilter {
   }
 
   private static Boolean checkAccess(List<String> policies, List<String> publication) {
-    for (String p : policies) {
-      if (publication.contains(p)) {
-        return true;
-      }
+    if (policies.stream().anyMatch(publication::contains)) {
+      return true;
     }
     // No publication related X-Policy or publication field we consider this legacy ft request
     return policies.isEmpty() && (publication.contains(PINK_FT) || publication.isEmpty());
@@ -65,10 +63,10 @@ public class CheckPublicationPolicy implements ApiFilter {
   }
 
   private List<String> getPublicationPolicies(List<String> policies) {
-    policies.removeIf(n -> !n.contains(PUBLICATION_PREFIX));
     return policies.stream()
-        .map(var -> var.replaceFirst(PUBLICATION_PREFIX, ""))
-        .collect(Collectors.toList());
+            .filter(p -> p.contains(PUBLICATION_PREFIX))
+            .map(p -> p.replaceFirst(PUBLICATION_PREFIX, ""))
+            .collect(Collectors.toList());
   }
 
   private boolean isEligibleForPublicationPolicyCheck(final MutableResponse response) {
