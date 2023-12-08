@@ -63,6 +63,7 @@ public class ApiFilters {
   private ApiFilter unrolledContentFilter;
   private ApiFilter editorialDeskFilter;
   private ApiFilter internalAnalyticsTagsFilter;
+  private ApiFilter publicationPolicyChecker;
 
   private BodyProcessingFieldTransformer getBodyProcessingFieldTransformer() {
     return (BodyProcessingFieldTransformer)
@@ -147,6 +148,7 @@ public class ApiFilters {
     internalAnalyticsTagsFilter =
         new RemoveJsonPropertiesUnlessPolicyPresentFilter(
             jsonTweaker, Collections.singleton(INTERNAL_ANALYTICS), INTERNAL_ANALYTICS_TAG_FILTER);
+    publicationPolicyChecker = new CheckPublicationPolicy(jsonTweaker);
   }
 
   public ApiFilter notificationsFilter() {
@@ -186,6 +188,7 @@ public class ApiFilters {
       addSyndication,
       canBeSyndicatedAccessFilter,
       identifiersFilter,
+      publicationPolicyChecker,
       webUrlAdder,
       canonicalWebUrlAdder,
       linkValidationFilter,
@@ -204,7 +207,7 @@ public class ApiFilters {
       contentPackageFilter,
       unrolledContentFilter,
       editorialDeskFilter,
-      internalAnalyticsTagsFilter
+      internalAnalyticsTagsFilter,
     };
   }
 
@@ -213,6 +216,7 @@ public class ApiFilters {
       addSyndication,
       canBeSyndicatedAccessFilter,
       identifiersFilter,
+      publicationPolicyChecker,
       webUrlAdder,
       canonicalWebUrlAdder,
       mainImageFilter,
@@ -227,7 +231,7 @@ public class ApiFilters {
       removeAccessFieldRegardlessOfPolicy,
       unrolledContentFilter,
       editorialDeskFilter,
-      internalAnalyticsTagsFilter
+      internalAnalyticsTagsFilter,
     };
   }
 
@@ -237,6 +241,7 @@ public class ApiFilters {
       addSyndication,
       canBeSyndicatedAccessFilter,
       identifiersFilter,
+      publicationPolicyChecker,
       webUrlAdder,
       canonicalWebUrlAdder,
       linkValidationFilter,
@@ -255,7 +260,7 @@ public class ApiFilters {
       contentPackageFilter,
       unrolledContentFilter,
       editorialDeskFilter,
-      internalAnalyticsTagsFilter
+      internalAnalyticsTagsFilter,
     };
   }
 
@@ -277,6 +282,7 @@ public class ApiFilters {
       addSyndication,
       canBeSyndicatedAccessFilter,
       identifiersFilter,
+      publicationPolicyChecker,
       webUrlAdder,
       canonicalWebUrlAdder,
       linkValidationFilter,
@@ -301,6 +307,7 @@ public class ApiFilters {
       addSyndication,
       canBeSyndicatedAccessFilter,
       identifiersFilter,
+      publicationPolicyChecker,
       webUrlAdder,
       canonicalWebUrlAdder,
       suppressMarkup,
