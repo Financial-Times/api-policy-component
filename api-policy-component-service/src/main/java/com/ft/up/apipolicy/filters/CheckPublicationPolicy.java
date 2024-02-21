@@ -72,6 +72,7 @@ public class CheckPublicationPolicy implements ApiFilter {
 
   private List<String> getPublicationPolicies(List<String> policies) {
     return policies.stream()
+        .map(p -> p.replaceAll("\\s", ""))
         .filter(p -> p.contains(PUBLICATION_PREFIX))
         .map(p -> p.replaceFirst(PUBLICATION_PREFIX, ""))
         .collect(Collectors.toList());
