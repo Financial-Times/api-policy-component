@@ -57,6 +57,11 @@ public class CheckPublicationPolicy implements ApiFilter {
     if (policies.stream().anyMatch(publication::contains)) {
       return true;
     }
+
+    if (publication.isEmpty() && policies.contains(PINK_FT)) {
+      return true;
+    }
+
     // No publication related X-Policy or publication field we consider this legacy ft request
     return policies.isEmpty() && (publication.contains(PINK_FT) || publication.isEmpty());
   }
@@ -72,6 +77,7 @@ public class CheckPublicationPolicy implements ApiFilter {
 
   private List<String> getPublicationPolicies(List<String> policies) {
     return policies.stream()
+        .map(p -> p.replaceAll("\\s", ""))
         .filter(p -> p.contains(PUBLICATION_PREFIX))
         .map(p -> p.replaceFirst(PUBLICATION_PREFIX, ""))
         .collect(Collectors.toList());

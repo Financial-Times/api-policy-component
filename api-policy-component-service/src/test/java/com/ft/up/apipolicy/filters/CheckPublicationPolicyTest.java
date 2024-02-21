@@ -47,6 +47,27 @@ public class CheckPublicationPolicyTest {
   }
 
   @Test
+  public void LegacyAPIKeyWhitespaceShouldReturnOK() {
+    final MutableRequest mockedRequest = mock(MutableRequest.class);
+    String entity =
+        "{ \"type\":\"http://www.ft.com/ontology/content/Article\", \"bodyXML\": \"<body>something here</body>\",\"publication\":[\"http://www.ft.com/thing/8e6c705e-1132-42a2-8db0-c295e29e8658\",\"http://www.ft.com/thing/88fdde6c-2aa4-4f78-af02-9f680097cfd6\"] }";
+    MutableResponse validResponse =
+        new MutableResponse(new MultivaluedHashMap<>(), entity.getBytes());
+    validResponse.setStatus(200);
+    validResponse.getHeaders().putSingle("Content-Type", "application/json");
+    HashSet<String> p =
+        new HashSet<>(
+            Arrays.asList(
+                "INTERNAL_UNSTABLE", " ", " PBLC_READ_8e6c705e-1132-42a2-8db0-c295e29e8658"));
+    when(mockChain.callNextFilter(mockedRequest)).thenReturn(validResponse);
+    when(mockedRequest.getPolicies()).thenReturn(p);
+
+    MutableResponse response = checkPublicationPolicy.processRequest(mockedRequest, mockChain);
+
+    assertThat(response.getStatus(), is(200));
+  }
+
+  @Test
   public void ShouldReturn403() {
     final MutableRequest mockedRequest = mock(MutableRequest.class);
     String entity =
@@ -64,6 +85,46 @@ public class CheckPublicationPolicyTest {
     MutableResponse response = checkPublicationPolicy.processRequest(mockedRequest, mockChain);
 
     assertThat(response.getStatus(), is(403));
+  }
+
+  @Test
+  public void ShouldDeniedAccessNoPublicationFieldFTPink() {
+    final MutableRequest mockedRequest = mock(MutableRequest.class);
+    String entity =
+        "{ \"type\":\"http://www.ft.com/ontology/content/Article\", \"bodyXML\": \"<body>something here</body>\" }";
+    MutableResponse validResponse =
+        new MutableResponse(new MultivaluedHashMap<>(), entity.getBytes());
+    validResponse.setStatus(200);
+    validResponse.getHeaders().putSingle("Content-Type", "application/json");
+    HashSet<String> p =
+        new HashSet<>(
+            Arrays.asList("INTERNAL_UNSTABLE", "PBLC_READ_8e6c705e-1132-42a2-8db0-c295e29e8658"));
+    when(mockChain.callNextFilter(mockedRequest)).thenReturn(validResponse);
+    when(mockedRequest.getPolicies()).thenReturn(p);
+
+    MutableResponse response = checkPublicationPolicy.processRequest(mockedRequest, mockChain);
+
+    assertThat(response.getStatus(), is(403));
+  }
+
+  @Test
+  public void ShouldReturnOKNoPublicationFieldFTPinkReadFTPinkPolicy() {
+    final MutableRequest mockedRequest = mock(MutableRequest.class);
+    String entity =
+        "{ \"type\":\"http://www.ft.com/ontology/content/Article\", \"bodyXML\": \"<body>something here</body>\" }";
+    MutableResponse validResponse =
+        new MutableResponse(new MultivaluedHashMap<>(), entity.getBytes());
+    validResponse.setStatus(200);
+    validResponse.getHeaders().putSingle("Content-Type", "application/json");
+    HashSet<String> p =
+        new HashSet<>(
+            Arrays.asList("INTERNAL_UNSTABLE", "PBLC_READ_88fdde6c-2aa4-4f78-af02-9f680097cfd6"));
+    when(mockChain.callNextFilter(mockedRequest)).thenReturn(validResponse);
+    when(mockedRequest.getPolicies()).thenReturn(p);
+
+    MutableResponse response = checkPublicationPolicy.processRequest(mockedRequest, mockChain);
+
+    assertThat(response.getStatus(), is(200));
   }
 
   @Test
