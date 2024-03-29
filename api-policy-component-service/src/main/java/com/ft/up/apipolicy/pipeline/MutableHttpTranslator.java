@@ -88,7 +88,7 @@ public class MutableHttpTranslator {
       log.withTransactionId(transactionId);
 
       if (!policies.isEmpty() && !isBlank(transactionId)) {
-        log.withField(MESSAGE, "Processed " + POLICY_HEADER_NAME + " : " + policies.toString())
+        log.withField(MESSAGE, "Processed " + POLICY_HEADER_NAME + " : " + policies)
             .build()
             .logDebug();
       } else {
@@ -105,10 +105,7 @@ public class MutableHttpTranslator {
     Set<String> policies = new LinkedHashSet<>();
 
     if (values != null) {
-      values.forEach(
-          value -> {
-            policies.addAll(Arrays.asList(value.split("[ ,]")));
-          });
+      values.forEach(value -> policies.addAll(Arrays.asList(value.split("[ ,]"))));
     }
     return policies;
   }
@@ -145,7 +142,7 @@ public class MutableHttpTranslator {
   private void logBlacklistedHeader(String headerName, List<String> values, String transactionId) {
     if (LOGGER.isDebugEnabled() && !values.isEmpty()) {
       FluentLoggingBuilder.getNewInstance(CLASS_NAME, "logBlacklistedHeader")
-          .withField(MESSAGE, "Not Processed: " + headerName + "=" + values.toString())
+          .withField(MESSAGE, "Not Processed: " + headerName + "=" + values)
           .withTransactionId(transactionId)
           .build()
           .logDebug();
@@ -163,12 +160,12 @@ public class MutableHttpTranslator {
 
   private byte[] getEntityIfSupplied(HttpServletRequest realRequest) {
     try {
+      byte[] entity = null;
       ServletInputStream inputStream = realRequest.getInputStream();
       if (inputStream != null) {
-        byte[] entity = IOUtils.toByteArray(inputStream);
-        return entity;
+        entity = IOUtils.toByteArray(inputStream);
       }
-      return null;
+      return entity;
     } catch (IOException e) {
       throw ServerError.status(500).error(e.getMessage()).exception(e);
     }

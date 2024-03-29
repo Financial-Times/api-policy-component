@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
 public class CheckPublicationPolicy implements ApiFilter {
-  private static final String POLICY = "X-Policy";
   private static final String PUBLICATION = "publication";
   private static final String PUBLICATION_PREFIX = "PBLC_READ_";
   private static final String PINK_FT = "88fdde6c-2aa4-4f78-af02-9f680097cfd6";

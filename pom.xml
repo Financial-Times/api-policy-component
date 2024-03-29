@@ -11,7 +11,7 @@
   </modules>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jacoco-maven-plugin.version>0.7.7.201606060606</jacoco-maven-plugin.version>
+    <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
     <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
   </properties>
   <build>
@@ -36,6 +36,13 @@
                     <goal>report</goal>
                 </goals>
              </execution>
+            <execution>
+              <id>jacoco-site-aggregate</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>report-aggregate</goal>
+              </goals>
+            </execution>
           </executions>
         </plugin>
         <plugin>
