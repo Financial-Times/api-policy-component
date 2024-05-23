@@ -9,8 +9,11 @@ import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
-import static org.apache.commons.lang.StringUtils.*;
-import static org.apache.commons.lang.exception.ExceptionUtils.*;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 import com.ft.membership.logging.IntermediateYield;
 import com.ft.membership.logging.Operation;

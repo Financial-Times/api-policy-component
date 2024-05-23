@@ -8,7 +8,7 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.list;
 import static java.util.stream.Collectors.toList;
 import static javax.ws.rs.core.Response.status;
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import com.ft.api.jaxrs.errors.ServerError;
 import com.ft.up.apipolicy.util.FluentLoggingBuilder;
