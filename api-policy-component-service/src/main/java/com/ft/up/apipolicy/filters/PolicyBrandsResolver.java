@@ -32,9 +32,10 @@ public class PolicyBrandsResolver {
 
     Set<String> policySet = request.getPolicies();
 
-    Set<String> notKnownPolicies = new HashSet<String>();
+    Set<String> notKnownPolicies = new HashSet<>();
     for (String policy : policySet) {
       PolicyFilterParameter policyFilterParameter = policyFilterParameterMap.get(policy);
+      // This logic may include empty string policy as not known one
       if (policyFilterParameter == null) {
         notKnownPolicies.add(policy);
         continue;
@@ -52,13 +53,16 @@ public class PolicyBrandsResolver {
         }
       }
     }
-    if (!notKnownPolicies.isEmpty()) {
+    // Do not log if the only unknown policy is the empty one.
+    if (!notKnownPolicies.isEmpty()
+        && !(notKnownPolicies.size() == 1 && notKnownPolicies.contains(""))) {
       FluentLoggingBuilder.getNewInstance(CLASS_NAME, "applyQueryParams")
           .withTransactionId(get("transaction_id"))
           .withField(
               MESSAGE,
               "A policy in the request did not map to a known policy in the system : "
-                  + notKnownPolicies.toString())
+                  + notKnownPolicies)
+          .withRequest(request)
           .build()
           .logWarn();
     }

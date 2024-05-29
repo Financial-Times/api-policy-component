@@ -16,9 +16,11 @@ public class BodyTransformationXMLEventRegistry extends XMLEventHandlerRegistry 
 
   private static final String IMAGE_SET_CLASS_URI = "http://www.ft.com/ontology/content/ImageSet";
   private static final String CLIP_SET_CLASS_URI = "http://www.ft.com/ontology/content/ClipSet";
-  private static final String TYPE = "type";
+  private static final String CUSTOM_CODE_COMPONENT_CLASS_URI =
+      "http://www.ft.com/ontology/content/CustomCodeComponent";
   private static final String MEDIA_RESOURCE_CLASS_URI =
       "http://www.ft.com/ontology/content/MediaResource";
+  private static final String TYPE = "type";
   private static final String FT_CONTENT = "ft-content";
   private static final String[] elementsToStrip = {
     "pull-quote", "promo-box", "ft-related", "timeline", "ft-timeline", "table", "big-number", "img"
@@ -56,7 +58,10 @@ public class BodyTransformationXMLEventRegistry extends XMLEventHandlerRegistry 
     final XMLEventHandler removeImageSet =
         new StripElementIfSpecificAttributesXmlEventHandler(
             Collections.singletonMap(TYPE, IMAGE_SET_CLASS_URI), removeMediaResource);
+    final XMLEventHandler removeCustomCodeComponent =
+        new StripElementIfSpecificAttributesXmlEventHandler(
+            Collections.singletonMap(TYPE, CUSTOM_CODE_COMPONENT_CLASS_URI), removeImageSet);
     return new StripElementIfSpecificAttributesXmlEventHandler(
-        Collections.singletonMap(TYPE, CLIP_SET_CLASS_URI), removeImageSet);
+        Collections.singletonMap(TYPE, CLIP_SET_CLASS_URI), removeCustomCodeComponent);
   }
 }

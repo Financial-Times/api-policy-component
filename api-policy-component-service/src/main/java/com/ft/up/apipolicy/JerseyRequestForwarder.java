@@ -18,7 +18,7 @@ import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * JerseyRequestForwarder
@@ -50,6 +50,7 @@ public class JerseyRequestForwarder implements RequestForwarder {
 
     resource = extractHeaders(request, resource);
 
+    // It logs 10M+ logs per day, but we have the called URI and user-agent in these logs
     FluentLoggingBuilder.getNewInstance(CLASS_NAME, "forwardRequest")
         .withTransactionId(request.getTransactionId())
         .withRequest(request)
@@ -93,15 +94,20 @@ public class JerseyRequestForwarder implements RequestForwarder {
       result.setStatus(responseStatus);
       result.setHeaders(clientResponse.getHeaders());
     } finally {
-      FluentLoggingBuilder.getNewInstance(CLASS_NAME, "constructMutableResponse")
-          .withTransactionId(request.getTransactionId())
-          .withResponse(clientResponse)
-          .withField(PATH, request.getAbsolutePath())
-          .withField(URI, clientResponse.getLocation())
-          .withField(MESSAGE, "Response")
-          .withField(STATUS, clientResponse.getStatus())
-          .build()
-          .logInfo();
+      FluentLoggingBuilder responseLog =
+          FluentLoggingBuilder.getNewInstance(CLASS_NAME, "constructMutableResponse")
+              .withTransactionId(request.getTransactionId())
+              .withResponse(clientResponse)
+              .withField(PATH, request.getAbsolutePath())
+              .withField(URI, clientResponse.getLocation())
+              .withField(MESSAGE, "Response")
+              .withField(STATUS, clientResponse.getStatus());
+      // We used to have 10M+ logs per day of such logs of "Response"
+      if (clientResponse.getStatus() != 200 && clientResponse.getStatus() != 404) {
+        responseLog.build().logInfo();
+      } else {
+        responseLog.build().logDebug();
+      }
       clientResponse.close();
     }
 
@@ -112,8 +118,7 @@ public class JerseyRequestForwarder implements RequestForwarder {
       Response clientResponse, MutableResponse result, byte[] responseEntity) {
 
     int responseStatus = clientResponse.getStatus();
-    if ((responseStatus >= 500) && ((responseEntity == null) || (responseEntity.length == 0))) {
-
+    if (responseStatus >= 500 && (responseEntity == null || responseEntity.length == 0)) {
       FluentLoggingBuilder.getNewInstance(CLASS_NAME, "handleResponseStatus")
           .withField(MESSAGE, "server error response has no entity")
           .build()
@@ -172,12 +177,7 @@ public class JerseyRequestForwarder implements RequestForwarder {
       String transactionId) {
     FluentLoggingBuilder.getNewInstance(CLASS_NAME, methodName)
         .withTransactionId(transactionId)
-        .withField(
-            MESSAGE,
-            customMessage
-                + logArguments.keySet().toString()
-                + " : "
-                + logArguments.values().toString())
+        .withField(MESSAGE, customMessage + logArguments.keySet() + " : " + logArguments.values())
         .build()
         .logDebug();
   }

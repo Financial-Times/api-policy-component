@@ -145,6 +145,16 @@ public class BodyProcessingFieldTransformerFactoryTest {
     checkTransformation(original, expected);
   }
 
+  @Test
+  public void shouldRemoveCustomCodeComponentAndStripOutSurroundingTag() {
+    String original =
+        "<body><p>He sheltered there - CustomCodeComponent.</p>\n<p><ft-content data-embedded=\"true\" type=\"http://www.ft.com/ontology/content/CustomCodeComponent\" url=\"http://api.ft.com/content/11111111-1111-1111-1111-11111111111\"></ft-content></p>\n<p>“I saw bodies everywhere.”</p>\n\n\n\n</body>";
+    String expected =
+        "<body><p>He sheltered there - CustomCodeComponent.</p>\n<p>“I saw bodies everywhere.”</p>\n\n\n\n</body>";
+
+    checkTransformation(original, expected);
+  }
+
   private void checkTransformation(String originalBody, String expectedTransformedBody) {
     String actualTransformedBody = bodyTransformer.transform(originalBody, TRANSACTION_ID);
     assertThat(actualTransformedBody, is(equivalentToUnixString(expectedTransformedBody)));

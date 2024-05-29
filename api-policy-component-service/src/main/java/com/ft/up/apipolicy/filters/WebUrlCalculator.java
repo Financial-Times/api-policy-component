@@ -60,7 +60,7 @@ public class WebUrlCalculator implements ApiFilter {
     Object type = content.get(TYPE_KEY);
     Object types = content.get(TYPES_KEY);
     return ARTICLE_TYPE.equals(type)
-        || ((types instanceof Collection) && ((Collection) types).contains(ARTICLE_TYPE));
+        || (types instanceof Collection && ((Collection) types).contains(ARTICLE_TYPE));
   }
 
   private boolean isVideo(Map<String, Object> content) {
@@ -71,7 +71,7 @@ public class WebUrlCalculator implements ApiFilter {
         if (identifiersIterator.hasNext()) {
           Object identifierRaw = identifiersIterator.next();
           if (identifierRaw instanceof Map) {
-            Map identifier = ((Map) identifierRaw);
+            Map identifier = (Map) identifierRaw;
             if (identifier.containsKey(AUTHORITY_KEY)) {
               final Object authority = identifier.get(AUTHORITY_KEY);
               if (NEXT_VIDEO_EDITOR_AUTHORITY.equals(authority)) {
