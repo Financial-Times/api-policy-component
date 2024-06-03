@@ -19,6 +19,11 @@ public class SuppressRichContentMarkupFilter implements ApiFilter {
   private final JsonConverter jsonConverter;
   private BodyProcessingFieldTransformer transformer;
 
+  private static final String TYPE_FIELD = "type";
+
+  private static final String CUSTOM_CODE_COMPONENT_CLASS_URI =
+      "http://www.ft.com/ontology/content/CustomCodeComponent";
+
   public SuppressRichContentMarkupFilter(
       JsonConverter jsonConverter, BodyProcessingFieldTransformer transformer) {
     this.jsonConverter = jsonConverter;
@@ -39,6 +44,13 @@ public class SuppressRichContentMarkupFilter implements ApiFilter {
     }
 
     Map<String, Object> content = jsonConverter.readEntity(response);
+
+    if (content.get(TYPE_FIELD) != null
+        && content.get(TYPE_FIELD).equals(CUSTOM_CODE_COMPONENT_CLASS_URI)) {
+      // In case of CustomCodeComponent skip stripping bodyXML rich content
+      // regardless of INCLUDE_RICH_CONTENT policy
+      return response;
+    }
 
     for (String key : XML_KEYS) {
       String xml = (String) content.get(key);
